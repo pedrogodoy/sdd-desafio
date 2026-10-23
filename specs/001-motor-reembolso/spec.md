@@ -47,11 +47,15 @@ e impede você de mover a trave depois.>
 
 Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
-### RN-001 — <nome da regra>
+### RN-001 — Limite diário por categoria (alimentação e transporte urbano)
 
-**Regra:** <enunciado sem ambiguidade>
-**Origem:** política do RH, item `<n>`
-**Aceite:** <como verificar que está implementada — normalmente um caso concreto com números>
+**Regra:** para cada combinação de data e categoria, soma-se o valor das despesas elegíveis (ver seção 8). Limites: alimentação R$ 60,00; transporte urbano R$ 80,00. Se a soma for menor ou igual ao limite, todas as despesas do grupo são reembolsadas integralmente. Se exceder, o limite é distribuído do menor valor para o maior (desempate por `id` crescente): cada despesa recebe o seu valor integral enquanto houver saldo, a que não couber inteira recebe apenas o saldo restante e as seguintes recebem R$ 0,00. Despesas com reembolso menor que o valor original são marcadas como reembolsadas parcialmente, com o motivo "limite diário excedido".
+**Origem:** política do RH, itens 1, 2 e 4. Decisões AMB-001, AMB-002, AMB-003.
+**Aceite:**
+- Alimentação em 03/07: d-001 (R$ 72,50) e d-002 (R$ 38,00) → d-002 recebe R$ 38,00, d-001 recebe R$ 22,00 (parcial); total do dia R$ 60,00.
+- Uma única despesa de alimentação de R$ 61,00 no dia → recebe R$ 60,00 (parcial).
+- Uma única despesa de alimentação de R$ 60,00 no dia → recebe R$ 60,00 (integral).
+- Alimentação R$ 50,00 e transporte R$ 70,00 na mesma data → ambas integrais (limites independentes).
 
 ### RN-002 — ...
 
@@ -63,13 +67,29 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 > Uma ambiguidade que você resolveu no código sem registrar aqui conta como
 > não resolvida.
 
-### AMB-001 — <o que a política deixou em aberto>
+### AMB-001 — Unidade de aplicação do limite diário
 
-**Texto original do RH:** "<citação literal>"
-**O que não está claro:** <as duas ou mais leituras possíveis>
-**Decisão:** <o que o sistema faz>
-**Justificativa:** <por quê — uma linha; critério de negócio, não de conveniência técnica>
-**Regra afetada:** RN-00X
+**Texto original do RH:** "Alimentação tem limite de R$ 60 por dia." / "Transporte urbano tem limite de R$ 80 por dia."
+**O que não está claro:** o limite pode valer (a) para cada despesa isoladamente ou (b) para a soma das despesas do mesmo dia. Exemplo: d-001 (R$ 72,50) + d-002 (R$ 38,00) em 03/07 resultam em R$ 98,00 na leitura (a) e R$ 60,00 na leitura (b).
+**Decisão:** o limite se aplica à **soma das despesas de uma mesma categoria numa mesma data**. Categorias diferentes no mesmo dia têm limites independentes.
+**Justificativa:** a política diz "por dia", não "por despesa" ou "por refeição"; ler como por despesa permitiria multiplicar o teto fracionando gastos.
+**Regra afetada:** RN-001
+
+### AMB-002 — Distribuição do limite diário entre as despesas do dia
+
+**Texto original do RH:** (silêncio) — consequência de AMB-001.
+**O que não está claro:** quando a soma do dia excede o limite, o valor reembolsado precisa ser atribuído a cada despesa. Leituras possíveis: (a) proporcional ao valor de cada item, (b) na ordem em que aparecem na entrada, (c) dos menores para os maiores. Exemplo em 03/07 (limite R$ 60): (a) d-001 R$ 39,37 / d-002 R$ 20,63; (b) d-001 R$ 60,00 / d-002 R$ 0,00; (c) d-001 R$ 22,00 / d-002 R$ 38,00.
+**Decisão:** o limite é consumido **do menor valor para o maior**. Em caso de valores iguais, desempata pelo `id` em ordem crescente. O último item a caber recebe apenas o saldo restante do limite.
+**Justificativa:** maximiza a quantidade de despesas pagas integralmente e o resultado não depende da ordem em que as despesas foram lançadas.
+**Regra afetada:** RN-001
+
+### AMB-003 — Significado de "reembolsadas parcialmente"
+
+**Texto original do RH:** "Despesas acima do limite são reembolsadas parcialmente."
+**O que não está claro:** (a) paga-se até o limite e corta-se apenas o excedente, ou (b) a despesa que ultrapassa o limite é recusada inteira. Exemplo: um jantar de R$ 61,00 sozinho no dia recebe R$ 60,00 em (a) e R$ 0,00 em (b).
+**Decisão:** paga-se **até o limite**; apenas o excedente é cortado.
+**Justificativa:** é a leitura literal de "parcialmente"; recusar o item inteiro seria "não reembolsadas".
+**Regra afetada:** RN-001
 
 ### AMB-002 — ...
 
