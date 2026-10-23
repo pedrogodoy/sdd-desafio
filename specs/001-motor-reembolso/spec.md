@@ -96,7 +96,29 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 - Despesa de R$ 0,00 → recusada com o mesmo motivo.
 - Transporte R$ 70,00 e −R$ 20,00 no mesmo dia → a de R$ 70,00 recebe R$ 70,00 (o negativo não altera a soma do dia).
 
-### RN-006 — ...
+### RN-006 — Limite de hospedagem por diária
+
+**Regra:** cada despesa de hospedagem é avaliada isoladamente (não há soma por dia). O número de diárias **N** é obtido da `descricao`: o primeiro número inteiro escrito em algarismos, maior que zero, seguido (com ou sem espaço) de uma das palavras "diária", "diárias", "noite" ou "noites" — sem diferenciar maiúsculas/minúsculas nem acentos. Se não houver esse padrão, N = 1. O limite base é N × R$ 250,00; como toda hospedagem caracteriza viagem (RN-007), o limite aplicado é sempre o ampliado, **N × R$ 375,00**. Acima dele, paga-se o limite e o excedente é cortado (AMB-003). A saída informa o N considerado.
+**Origem:** política do RH, itens 3, 4 e 6. Decisões AMB-003, AMB-010, AMB-011.
+**Aceite:**
+- d-010: "Hotel Rio - 2 diarias", R$ 480,00, com nota → N = 2, limite R$ 750,00 → recebe R$ 480,00 (integral).
+- "Hotel - 2 diarias", R$ 800,00, com nota → limite R$ 750,00 → recebe R$ 750,00 (parcial).
+- "Pousada", R$ 400,00, com nota → sem padrão, N = 1 → recebe R$ 375,00 (parcial).
+- "Hotel duas diarias", R$ 400,00, com nota → número por extenso não é reconhecido, N = 1 → recebe R$ 375,00 (parcial).
+- d-013: "Airbnb 3 noites", R$ 690,00, sem nota → recusada por RN-002 antes do limite (N = 3 não chega a ser aplicado).
+
+### RN-007 — Ampliação de limites em viagem
+
+**Regra:** o colaborador é considerado **em viagem** em cada data coberta por uma hospedagem **não recusada** (integral ou parcialmente reembolsada): da `data` da hospedagem até `data` + N dias, inclusive (o dia de check-out conta). Nessas datas, os limites diários de alimentação e transporte urbano são ampliados em 50%: alimentação R$ 90,00 e transporte urbano R$ 120,00. Hospedagem recusada por qualquer regra não caracteriza viagem. Hospedagens que se sobrepõem simplesmente somam suas datas cobertas (a ampliação não acumula). A saída indica, por despesa, se o limite ampliado foi aplicado.
+**Origem:** política do RH, item 6. Decisão AMB-011.
+**Aceite:**
+- d-010 (14/07, N = 2, aceita) → em viagem em 14/07, 15/07 e 16/07.
+- d-011: café de R$ 33,33 em 15/07 → limite de alimentação do dia R$ 90,00 → integral.
+- Alimentação de R$ 85,00 em 16/07 (check-out de d-010) → integral (limite R$ 90,00).
+- Alimentação de R$ 85,00 em 17/07 → R$ 60,00 (parcial; fora da viagem).
+- d-013 (22/07, recusada por falta de nota) → 22/07 a 25/07 **não** são dias de viagem; alimentação de R$ 70,00 em 23/07 → R$ 60,00 (parcial).
+
+### RN-008 — ...
 
 ---
 
@@ -177,6 +199,23 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Decisão:** valores menores ou iguais a zero são **recusados** e listados na saída com motivo; não afetam limites nem totais.
 **Justificativa:** o motor calcula o que pagar ao colaborador, não um saldo; sem a despesa original no período, não há o que estornar, e abater créditos cobraria do colaborador algo que pode nunca ter sido reembolsado.
 **Regra afetada:** RN-005
+
+### AMB-010 — Número de diárias de uma hospedagem
+
+**Texto original do RH:** "Hospedagem tem limite de R$ 250 por diária."
+**O que não está claro:** a entrada não tem campo de número de diárias nem data de saída; cada lançamento traz só uma data e o valor total. Leituras: (a) extrair o número de diárias da descrição; (b) tratar cada lançamento como uma diária; (c) recusar ou mandar para revisão. Exemplo: d-010, "Hotel Rio - 2 diarias", R$ 480,00 → R$ 480,00 em (a), R$ 250,00 em (b).
+**Decisão:** o número de diárias é **extraído da descrição** segundo o padrão definido em RN-006; sem padrão reconhecível, considera-se **1 diária**.
+**Justificativa:** a descrição é a única fonte da informação na entrada e tratar toda estadia como uma diária penalizaria viagens legítimas; o padrão é estrito e o fallback é conservador, para que o resultado seja sempre previsível.
+**Regra afetada:** RN-006
+
+### AMB-011 — O que caracteriza "em viagem"
+
+**Texto original do RH:** "Colaborador em viagem tem limites ampliados em 50%."
+**O que não está claro:** a entrada não tem campo que indique viagem. Leituras: (a) a ampliação nunca se aplica por falta de dado; (b) a viagem é inferida a partir de outras despesas. Se inferida, ficam em aberto: quais dias contam (inclusive o de check-out?), se uma hospedagem recusada ainda caracteriza viagem e se a ampliação vale para a própria hospedagem.
+**Decisão:** viagem é **inferida das hospedagens não recusadas**: datas de `data` a `data` + N (inclusive o check-out). Hospedagem recusada não caracteriza viagem. A ampliação vale para alimentação, transporte urbano e para a própria hospedagem (que, por definição, ocorre em viagem).
+**Justificativa:** hospedagem é a única evidência de deslocamento na entrada; o dia de check-out tem gastos típicos de viagem (refeição, táxi ao aeroporto); sem comprovante válido da hospedagem, não há prova de viagem.
+**Consequência assumida:** como toda hospedagem implica viagem, o limite de R$ 250,00 por diária nunca é aplicado isoladamente — o limite efetivo de hospedagem é sempre R$ 375,00 por diária.
+**Regra afetada:** RN-006, RN-007
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
