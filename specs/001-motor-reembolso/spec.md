@@ -24,7 +24,7 @@
 <Lista explícita. Este bloco vale ponto: ele impede o agente de inventar feature
 e impede você de mover a trave depois.>
 
-- Não faz `<...>`
+- Não controla prazo de entrega de nota fiscal nem mantém despesas em estado "pendente"; uma despesa recusada por falta de nota só é reavaliada se for lançada novamente em um novo cálculo (AMB-006).
 - Não faz `<...>`
 
 ## 4. Entrada e saída
@@ -57,7 +57,18 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 - Uma única despesa de alimentação de R$ 60,00 no dia → recebe R$ 60,00 (integral).
 - Alimentação R$ 50,00 e transporte R$ 70,00 na mesma data → ambas integrais (limites independentes).
 
-### RN-002 — ...
+### RN-002 — Nota fiscal obrigatória acima de R$ 100,00
+
+**Regra:** toda despesa cujo valor original seja estritamente maior que R$ 100,00 e que não tenha nota fiscal é **recusada integralmente** (reembolso R$ 0,00), com o motivo "nota fiscal ausente". Despesas com valor menor ou igual a R$ 100,00 não exigem nota. A avaliação é feita por despesa, sem considerar as demais do dia. Uma despesa recusada por esta regra não consome o limite diário (RN-001).
+**Origem:** política do RH, item 5. Decisões AMB-004, AMB-005, AMB-006.
+**Aceite:**
+- d-003: transporte R$ 100,00 sem nota → não exige nota; segue para o limite diário.
+- d-004: transporte R$ 100,01 sem nota → recusada, R$ 0,00, motivo "nota fiscal ausente".
+- Dia 06/07 (d-003 + d-004): apenas d-003 entra no limite de transporte → d-003 recebe R$ 80,00 (parcial); total do dia R$ 80,00.
+- Transporte R$ 60,00 + R$ 55,00 no mesmo dia, ambas sem nota → nenhuma exige nota; soma R$ 115,00 → limite de R$ 80,00 distribuído conforme RN-001.
+- Despesa de R$ 150,00 com nota → não é recusada por esta regra.
+
+### RN-003 — ...
 
 ---
 
@@ -91,7 +102,29 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Justificativa:** é a leitura literal de "parcialmente"; recusar o item inteiro seria "não reembolsadas".
 **Regra afetada:** RN-001
 
-### AMB-002 — ...
+### AMB-004 — Fronteira de "acima de R$ 100" para nota fiscal
+
+**Texto original do RH:** "Nota fiscal é obrigatória acima de R$ 100."
+**O que não está claro:** se uma despesa de exatamente R$ 100,00 exige nota. Exemplo: d-003 (R$ 100,00) e d-004 (R$ 100,01), ambas sem nota.
+**Decisão:** a nota é exigida apenas quando o valor é **estritamente maior que R$ 100,00**. R$ 100,00 não exige; R$ 100,01 exige.
+**Justificativa:** "acima de" em português indica comparação estrita; se o RH quisesse incluir 100 teria escrito "a partir de".
+**Regra afetada:** RN-002
+
+### AMB-005 — Unidade de aplicação da exigência de nota fiscal
+
+**Texto original do RH:** "Nota fiscal é obrigatória acima de R$ 100."
+**O que não está claro:** se o valor comparado é (a) o de cada despesa individualmente ou (b) a soma das despesas da mesma categoria no dia, como ocorre com o limite (AMB-001). Exemplo: d-003 (R$ 100,00) + d-004 (R$ 100,01) em 06/07 somam R$ 200,01 — em (a) só d-004 exige nota; em (b) ambas.
+**Decisão:** a exigência é avaliada **por despesa**, comparando o valor original de cada uma, independentemente das demais do dia.
+**Justificativa:** nota fiscal é o comprovante de uma compra específica; a soma do dia não corresponde a nenhum documento que o colaborador possa apresentar.
+**Regra afetada:** RN-002
+
+### AMB-006 — Consequência da ausência de nota fiscal exigida
+
+**Texto original do RH:** "Nota fiscal é obrigatória acima de R$ 100."
+**O que não está claro:** o que acontece com a despesa sem nota: (a) é recusada inteira, (b) é paga até R$ 100,00 e o excedente glosado, ou (c) fica pendente aguardando a nota. A política também não define prazo para entrega da nota, e a entrada só informa se a nota existe (sim/não).
+**Decisão:** a despesa é **recusada integralmente** e não consome o limite diário da categoria.
+**Justificativa:** "obrigatória" significa condição para o reembolso; sem prazo definido pelo RH, um estado "pendente" não teria fim — o motor avalia a situação no momento do cálculo.
+**Regra afetada:** RN-002
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
