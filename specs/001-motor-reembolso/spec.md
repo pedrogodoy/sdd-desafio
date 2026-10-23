@@ -68,7 +68,35 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 - Transporte R$ 60,00 + R$ 55,00 no mesmo dia, ambas sem nota → nenhuma exige nota; soma R$ 115,00 → limite de R$ 80,00 distribuído conforme RN-001.
 - Despesa de R$ 150,00 com nota → não é recusada por esta regra.
 
-### RN-003 — ...
+### RN-003 — Período de competência
+
+**Regra:** uma despesa só é elegível se a sua `data` estiver entre `periodo.inicio` e `periodo.fim`, **ambos inclusive**. Despesas fora desse intervalo são **recusadas integralmente** (reembolso R$ 0,00), aparecem na saída com o motivo "fora do período de competência" e não consomem limite diário.
+**Origem:** política do RH, item 7. Decisão AMB-007.
+**Aceite:**
+- d-008: data 15/04, período 01/07–31/07 → recusada, R$ 0,00, motivo "fora do período de competência".
+- Despesa com data igual a `periodo.inicio` (01/07) → elegível.
+- Despesa com data igual a `periodo.fim` (31/07) → elegível.
+- Despesa com data 01/08 → recusada.
+
+### RN-004 — Duplicatas
+
+**Regra:** duas ou mais despesas são duplicatas quando todos os campos, exceto `id`, são iguais: `data`, `categoria`, `descricao`, `fornecedor`, `valor` e `tem_nota_fiscal`. Em cada grupo de duplicatas, a despesa de menor `id` segue normalmente para as demais regras; as outras são **recusadas integralmente** (reembolso R$ 0,00), com o motivo "duplicata de `<id mantido>`", e não consomem limite diário.
+**Origem:** política do RH, item 8. Decisão AMB-008.
+**Aceite:**
+- d-006 e d-007 (idênticas) → d-006 segue para o limite e recebe R$ 54,90; d-007 recusada, R$ 0,00, motivo "duplicata de d-006".
+- Duas despesas iguais exceto pela descrição ("Almoço" e "Almoço equipe") → não são duplicatas; ambas seguem para o limite.
+- Três despesas idênticas d-020, d-021, d-022 → d-020 mantida; d-021 e d-022 recusadas como "duplicata de d-020".
+
+### RN-005 — Valores não positivos
+
+**Regra:** despesa com `valor` menor ou igual a R$ 0,00 é **recusada** (reembolso R$ 0,00), com o motivo "valor não positivo". Ela não entra na soma do limite diário nem abate o total do período.
+**Origem:** silêncio da política. Decisão AMB-009.
+**Aceite:**
+- d-009: transporte −R$ 45,00 em 11/07 → recusada, R$ 0,00, motivo "valor não positivo"; total do período não é reduzido.
+- Despesa de R$ 0,00 → recusada com o mesmo motivo.
+- Transporte R$ 70,00 e −R$ 20,00 no mesmo dia → a de R$ 70,00 recebe R$ 70,00 (o negativo não altera a soma do dia).
+
+### RN-006 — ...
 
 ---
 
@@ -126,6 +154,30 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Justificativa:** "obrigatória" significa condição para o reembolso; sem prazo definido pelo RH, um estado "pendente" não teria fim — o motor avalia a situação no momento do cálculo.
 **Regra afetada:** RN-002
 
+### AMB-007 — "Lançadas dentro do período de competência" sem data de lançamento
+
+**Texto original do RH:** "Despesas devem ser lançadas dentro do período de competência."
+**O que não está claro:** "lançada" remete à data de registro da despesa, mas a entrada só traz a data em que a despesa ocorreu (`data`). Leituras: (a) usar a data da despesa e exigir que esteja no período; (b) presumir que tudo o que está na entrada foi lançado no período, o que torna a regra inverificável. Também não está claro se os extremos do período são inclusivos, nem se a despesa fora do período deve ser recusada ou omitida. Exemplo: d-008 (15/04, "lançado com atraso") numa competência de julho; d-014 em 31/07, último dia.
+**Decisão:** a regra é avaliada sobre a **data da despesa**, que deve estar entre `inicio` e `fim`, **inclusive**. Despesa fora do período é **recusada e listada na saída** com o motivo.
+**Justificativa:** é o único dado disponível que torna a regra verificável; listar a recusa em vez de omitir mantém a saída auditável — o colaborador vê por que não recebeu.
+**Regra afetada:** RN-003
+
+### AMB-008 — Critério e tratamento de duplicatas
+
+**Texto original do RH:** "Duplicatas devem ser tratadas."
+**O que não está claro:** (1) o que caracteriza uma duplicata — todos os campos iguais, ou apenas alguns (data, categoria, fornecedor, valor); (2) o que "tratar" significa — manter uma e recusar as demais, recusar todas, ou apenas sinalizar e pagar. Exemplo: d-006 e d-007 são idênticas exceto pelo `id`.
+**Decisão:** duplicata exige **todos os campos iguais exceto `id`**. Mantém-se a de **menor `id`**; as demais são recusadas com referência à mantida.
+**Justificativa:** critério estrito evita recusar compras legítimas repetidas (ex.: dois cafés na mesma padaria com descrições diferentes); manter uma garante que o gasto real seja pago uma única vez.
+**Regra afetada:** RN-004
+
+### AMB-009 — Despesas com valor negativo (estorno)
+
+**Texto original do RH:** (silêncio) — a política não menciona valores negativos.
+**O que não está claro:** um lançamento negativo pode ser (a) erro de lançamento a recusar, (b) crédito que abate a soma do dia na categoria, ou (c) crédito que abate o total do período. Exemplo: d-009, "Estorno de corrida cancelada", −R$ 45,00 em 11/07; a corrida original não está na entrada.
+**Decisão:** valores menores ou iguais a zero são **recusados** e listados na saída com motivo; não afetam limites nem totais.
+**Justificativa:** o motor calcula o que pagar ao colaborador, não um saldo; sem a despesa original no período, não há o que estornar, e abater créditos cobraria do colaborador algo que pode nunca ter sido reembolsado.
+**Regra afetada:** RN-005
+
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
 
@@ -153,3 +205,5 @@ O sistema está pronto quando:
 
 <Perguntas que você não conseguiu responder e a decisão provisória que tomou.
 Honestidade aqui vale ponto — spec que finge não ter buraco é spec que esconde buraco.>
+
+- **Compras legítimas idênticas são tratadas como duplicata.** Duas despesas reais com todos os campos iguais (ex.: dois cafés de R$ 8,00, mesma descrição, mesma padaria, mesmo dia) não podem ser distinguidas, porque a entrada não traz horário nem número da nota. **Decisão provisória:** aplica-se AMB-008 — a segunda é recusada como duplicata. O colaborador pode relançá-la com descrição que a diferencie. Resolver de verdade exige um identificador da nota na entrada.
