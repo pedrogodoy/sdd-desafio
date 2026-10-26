@@ -113,12 +113,22 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Origem:** política do RH, item 6. Decisão AMB-011.
 **Aceite:**
 - d-010 (14/07, N = 2, aceita) → em viagem em 14/07, 15/07 e 16/07.
-- d-011: café de R$ 33,33 em 15/07 → limite de alimentação do dia R$ 90,00 → integral.
+- d-011: café de R$ 33,333 em 15/07 → limite de alimentação do dia R$ 90,00 → integral (R$ 33,33 após RN-008).
 - Alimentação de R$ 85,00 em 16/07 (check-out de d-010) → integral (limite R$ 90,00).
 - Alimentação de R$ 85,00 em 17/07 → R$ 60,00 (parcial; fora da viagem).
 - d-013 (22/07, recusada por falta de nota) → 22/07 a 25/07 **não** são dias de viagem; alimentação de R$ 70,00 em 23/07 → R$ 60,00 (parcial).
 
-### RN-008 — ...
+### RN-008 — Precisão e arredondamento
+
+**Regra:** todas as comparações e cálculos (limites, nota fiscal, soma do dia, distribuição do saldo) usam o `valor` **exatamente como informado na entrada**, sem arredondamento. Só o **valor reembolsado de cada despesa** é arredondado para 2 casas decimais, uma única vez, ao final, pelo critério **meio para o par** (quando a parte descartada é exatamente meio centavo, arredonda-se para o centavo par). Os totais da saída são a soma dos valores reembolsados já arredondados de cada despesa, para que a saída sempre feche item a item. O valor original é exibido na saída como veio na entrada.
+**Origem:** silêncio da política. Decisão AMB-012.
+**Aceite:**
+- d-011: R$ 33,333 → reembolso R$ 33,33.
+- Reembolso calculado de R$ 10,125 → R$ 10,12; de R$ 10,135 → R$ 10,14.
+- Alimentação R$ 33,333 + R$ 40,00 no mesmo dia (limite R$ 60,00) → a de R$ 33,333 recebe R$ 33,33; a de R$ 40,00 recebe o saldo exato de R$ 26,667 → R$ 26,67; total do dia R$ 60,00.
+- Despesa de R$ 100,004 sem nota → exige nota (100,004 > 100,00) e é recusada, embora R$ 100,004 arredondado fosse R$ 100,00.
+
+### RN-009 — ...
 
 ---
 
@@ -216,6 +226,14 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Justificativa:** hospedagem é a única evidência de deslocamento na entrada; o dia de check-out tem gastos típicos de viagem (refeição, táxi ao aeroporto); sem comprovante válido da hospedagem, não há prova de viagem.
 **Consequência assumida:** como toda hospedagem implica viagem, o limite de R$ 250,00 por diária nunca é aplicado isoladamente — o limite efetivo de hospedagem é sempre R$ 375,00 por diária.
 **Regra afetada:** RN-006, RN-007
+
+### AMB-012 — Precisão de valores e arredondamento
+
+**Texto original do RH:** (silêncio) — a política não fala de casas decimais.
+**O que não está claro:** valores com mais de 2 casas (d-011, R$ 33,333) podem ser arredondados (a) na entrada, antes das regras, ou (b) apenas no valor reembolsado final; e o critério pode ser (c) meio para cima ou (d) meio para o par. A escolha muda resultados em fronteiras (ex.: R$ 100,004 frente à regra de nota fiscal).
+**Decisão:** cálculos com o **valor exato**; arredondamento **só no reembolso de cada despesa**, para 2 casas, **meio para o par**. Totais = soma dos reembolsos já arredondados.
+**Justificativa:** não altera o valor que o colaborador declarou antes de aplicar as regras; meio para o par evita viés sistemático a favor de uma das partes quando há muitos lançamentos; somar itens arredondados garante que a saída feche sem diferenças de centavo.
+**Regra afetada:** RN-008
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
