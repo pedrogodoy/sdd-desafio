@@ -25,6 +25,7 @@
 e impede você de mover a trave depois.>
 
 - Não controla prazo de entrega de nota fiscal nem mantém despesas em estado "pendente"; uma despesa recusada por falta de nota só é reavaliada se for lançada novamente em um novo cálculo (AMB-006).
+- Não aplica restrição por dia da semana nem por feriado (AMB-014).
 - Não faz `<...>`
 
 ## 4. Entrada e saída
@@ -128,7 +129,17 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 - Alimentação R$ 33,333 + R$ 40,00 no mesmo dia (limite R$ 60,00) → a de R$ 33,333 recebe R$ 33,33; a de R$ 40,00 recebe o saldo exato de R$ 26,667 → R$ 26,67; total do dia R$ 60,00.
 - Despesa de R$ 100,004 sem nota → exige nota (100,004 > 100,00) e é recusada, embora R$ 100,004 arredondado fosse R$ 100,00.
 
-### RN-009 — ...
+### RN-009 — Categorias reembolsáveis
+
+**Regra:** as únicas categorias reembolsáveis são `alimentacao`, `transporte_urbano` e `hospedagem`. Antes da comparação, a `categoria` informada é normalizada: maiúsculas e minúsculas não se diferenciam e acentos são desconsiderados (`ALIMENTACAO`, `Alimentação` e `alimentacao` são a mesma categoria). Nenhuma outra transformação é feita (espaços, hífens ou sinônimos não são reconhecidos). Despesa cuja categoria normalizada não seja uma das três é **recusada integralmente** (reembolso R$ 0,00), com o motivo "categoria fora da política", e não consome limite diário. A saída exibe a categoria normalizada.
+**Origem:** política do RH, item 9. Decisão AMB-013.
+**Aceite:**
+- d-005: `coworking`, R$ 89,00 → recusada, R$ 0,00, motivo "categoria fora da política".
+- d-014: `ALIMENTACAO`, R$ 61,00 em 31/07 → tratada como `alimentacao`; recebe R$ 60,00 (parcial).
+- `Alimentação` (com acento e inicial maiúscula) → tratada como `alimentacao`.
+- `transporte urbano` (espaço no lugar do sublinhado) → recusada como "categoria fora da política".
+
+### RN-010 — ...
 
 ---
 
@@ -234,6 +245,22 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Decisão:** cálculos com o **valor exato**; arredondamento **só no reembolso de cada despesa**, para 2 casas, **meio para o par**. Totais = soma dos reembolsos já arredondados.
 **Justificativa:** não altera o valor que o colaborador declarou antes de aplicar as regras; meio para o par evita viés sistemático a favor de uma das partes quando há muitos lançamentos; somar itens arredondados garante que a saída feche sem diferenças de centavo.
 **Regra afetada:** RN-008
+
+### AMB-013 — Grafia da categoria
+
+**Texto original do RH:** "Categorias fora da política não são reembolsáveis."
+**O que não está claro:** se uma categoria escrita com grafia diferente (d-014, `ALIMENTACAO`) é a mesma categoria da política ou uma categoria desconhecida, a ser recusada.
+**Decisão:** maiúsculas/minúsculas e acentos são **normalizados**; qualquer outra diferença de grafia torna a categoria desconhecida.
+**Justificativa:** diferença de caixa ou acento não muda o significado da categoria e não deve custar o reembolso ao colaborador; ir além disso (sinônimos, espaços) exigiria adivinhar a intenção.
+**Regra afetada:** RN-009
+
+### AMB-014 — Despesas em fim de semana
+
+**Texto original do RH:** (silêncio) — a política não menciona dias da semana.
+**O que não está claro:** se despesas em sábado, domingo ou feriado têm alguma restrição. Exemplo: d-012, "Almoço de sábado - plantão", R$ 47,20.
+**Decisão:** **sem restrição**; despesas de fim de semana seguem exatamente as mesmas regras dos demais dias.
+**Justificativa:** criar uma restrição seria inventar uma regra que o RH não escreveu; plantão e viagem em fim de semana são situações legítimas.
+**Regra afetada:** nenhuma (RN-001 aplica-se a qualquer data). Aceite: d-012 recebe R$ 47,20 (integral).
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
