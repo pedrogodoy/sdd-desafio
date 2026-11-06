@@ -1,10 +1,5 @@
 # CLAUDE.md
 
-> Este arquivo é lido pelo Claude Code no início de toda sessão. É onde moram as
-> convenções que você não quer repetir em todo prompt.
-> Substitua os `<...>` e apague o que não usar. Mantenha curto — CLAUDE.md longo
-> é CLAUDE.md ignorado.
-
 ## O projeto
 
 Motor de cálculo de reembolso de despesas corporativas. CLI que lê um JSON de
@@ -34,16 +29,19 @@ Se o que eu pedi não está coberto por nenhuma task, me avise em vez de impleme
 
 ## Stack e comandos
 
-- Linguagem: `<...>`
-- Rodar: `<comando>`
-- Testes: `<comando>`
-- Lint/format: `<comando>`
+- Linguagem: TypeScript sobre Node.js 20 (detalhes e motivos em `plan.md` §1)
+- Rodar: `npm run reembolso -- calcular --input <entrada.json> --output <saida.json>`
+- Testes: `npm test`
+- Checagem de tipos: `npm run typecheck`
 
 ## Convenções de código
 
-- `<nomenclatura, estrutura de pastas, tratamento de erro, o que for relevante>`
-- Valores monetários: `<como são representados — decimal, centavos em inteiro, etc.>`
+- Estrutura de pastas e responsabilidade de cada módulo: `plan.md` §2. Uma regra (RN) por arquivo em `src/regras/`.
+- Só `src/cli.ts` faz I/O; o resto é função pura.
+- Números e textos da política só em `src/politica.ts` — nunca literais dentro de `src/regras/`.
+- Valores monetários: sempre `Decimal` (decimal.js). Nunca `number` em cálculo ou comparação de dinheiro; arredondamento só na saída (RN-008).
+- Testes: um arquivo por RN (`tests/rn-00N-*.test.ts`), `describe` com o ID da regra e `it` com o caso de aceite da spec.
 
 ## Fora de escopo
 
-- `<o que este projeto explicitamente não faz — evita que o agente invente feature>`
+- Ver `spec.md` §3. Não adicionar comando, flag, campo de saída ou regra que não esteja na spec.
