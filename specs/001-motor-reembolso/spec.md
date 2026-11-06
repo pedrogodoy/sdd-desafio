@@ -34,15 +34,77 @@ e impede você de mover a trave depois.>
 
 | Campo | Tipo | Significado | Obrigatório |
 |---|---|---|---|
-| | | | |
+| `colaborador.id` | texto | identificador do colaborador | sim |
+| `colaborador.nome` | texto | nome do colaborador | sim |
+| `colaborador.centro_custo` | texto | centro de custo | sim |
+| `periodo.competencia` | texto `AAAA-MM` | mês de competência | sim |
+| `periodo.inicio` | data `AAAA-MM-DD` | primeiro dia do período (inclusive) | sim |
+| `periodo.fim` | data `AAAA-MM-DD` | último dia do período (inclusive) | sim |
+| `despesas[]` | lista | despesas a avaliar (pode ser vazia) | sim |
+| `despesas[].id` | texto | identificador único da despesa | sim |
+| `despesas[].data` | data `AAAA-MM-DD` | data em que a despesa ocorreu; para hospedagem, a data de entrada | sim |
+| `despesas[].categoria` | texto | categoria informada pelo colaborador (normalizada por RN-009) | sim |
+| `despesas[].descricao` | texto | descrição livre; para hospedagem, fonte do número de diárias (RN-006) | sim |
+| `despesas[].fornecedor` | texto | estabelecimento | sim |
+| `despesas[].valor` | número | valor em reais, como informado (pode ter mais de 2 casas ou ser negativo) | sim |
+| `despesas[].tem_nota_fiscal` | booleano | se há nota fiscal | sim |
 
-**Saída:** definida por mim. Estrutura e significado de cada campo:
+Entrada que não segue este formato (campo obrigatório ausente, tipo errado, data inválida ou `id` repetido) é **rejeitada por inteiro**: nenhuma saída é gerada e o erro informa o problema encontrado.
+
+**Saída:** um único documento com a mesma estrutura de `colaborador` e `periodo` da entrada, a avaliação de cada despesa e os totais.
 
 | Campo | Tipo | Significado |
 |---|---|---|
-| | | |
+| `colaborador` | objeto | cópia do `colaborador` da entrada |
+| `periodo` | objeto | cópia do `periodo` da entrada |
+| `despesas[]` | lista | uma entrada por despesa da entrada, **na mesma ordem** |
+| `despesas[].id` | texto | `id` da despesa |
+| `despesas[].data` | data | `data` da despesa |
+| `despesas[].categoria` | texto | categoria **normalizada** (RN-009) |
+| `despesas[].valor_original` | número | `valor` exatamente como veio na entrada |
+| `despesas[].valor_reembolsado` | número | valor a reembolsar, com 2 casas (RN-008); R$ 0,00 se recusada |
+| `despesas[].status` | texto | `integral` (reembolsado = original), `parcial` (0 < reembolsado < original) ou `recusada` |
+| `despesas[].motivos` | lista de textos | vazia se `integral`; se `parcial`, "limite diário excedido" ou "limite de hospedagem excedido"; se `recusada`, todos os motivos da fase 1 (seção 8) |
+| `despesas[].limite_aplicado` | número ou nulo | limite que valeu para a despesa: diário da categoria (60, 90, 80 ou 120) ou de hospedagem (N × 375); nulo se recusada |
+| `despesas[].em_viagem` | booleano | se a data da despesa é uma data em viagem (RN-007) |
+| `despesas[].diarias` | inteiro ou nulo | N considerado (RN-006); nulo se não for hospedagem |
+| `totais.valor_reembolsado` | número | soma dos `valor_reembolsado` de todas as despesas |
+| `totais.quantidade.integral` | inteiro | número de despesas com status `integral` |
+| `totais.quantidade.parcial` | inteiro | número de despesas com status `parcial` |
+| `totais.quantidade.recusada` | inteiro | número de despesas com status `recusada` |
 
-<Cole um exemplo de saída para uma entrada pequena. Vale mais que três parágrafos.>
+**Exemplo** (entrada com apenas d-001, d-002 e d-005):
+
+```json
+{
+  "colaborador": { "id": "c-0417", "nome": "Marina Volpi", "centro_custo": "CC-ENG-PLATAFORMA" },
+  "periodo": { "competencia": "2026-07", "inicio": "2026-07-01", "fim": "2026-07-31" },
+  "despesas": [
+    {
+      "id": "d-001", "data": "2026-07-03", "categoria": "alimentacao",
+      "valor_original": 72.50, "valor_reembolsado": 22.00,
+      "status": "parcial", "motivos": ["limite diário excedido"],
+      "limite_aplicado": 60.00, "em_viagem": false, "diarias": null
+    },
+    {
+      "id": "d-002", "data": "2026-07-03", "categoria": "alimentacao",
+      "valor_original": 38.00, "valor_reembolsado": 38.00,
+      "status": "integral", "motivos": [],
+      "limite_aplicado": 60.00, "em_viagem": false, "diarias": null
+    },
+    {
+      "id": "d-005", "data": "2026-07-07", "categoria": "coworking",
+      "valor_original": 89.00, "valor_reembolsado": 0.00,
+      "status": "recusada", "motivos": ["categoria fora da política"],
+      "limite_aplicado": null, "em_viagem": false, "diarias": null
+    }
+  ],
+  "totais": {
+    "valor_reembolsado": 60.00,
+    "quantidade": { "integral": 1, "parcial": 1, "recusada": 1 }
+  }
+}
+```
 
 ## 5. Regras de negócio
 
