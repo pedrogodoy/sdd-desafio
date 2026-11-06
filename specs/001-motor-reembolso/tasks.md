@@ -14,7 +14,7 @@
 
 ## Fase 1 — Fundação
 
-- [ ] **T-001** — Inicializa o projeto: `package.json` com dependências do plan §1, `tsconfig.json`, scripts `reembolso`, `test` e `typecheck`.
+- [x] **T-001** — Inicializa o projeto: `package.json` com dependências do plan §1, `tsconfig.json`, scripts `reembolso`, `test` e `typecheck`.
   - **Atende:** plan §1
   - **Aceite:** `npm test` executa e passa `tests/setup.test.ts` (teste trivial); `npm run typecheck` termina sem erros.
   - **Commit:**
