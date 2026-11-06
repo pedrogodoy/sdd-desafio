@@ -275,8 +275,33 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
 ## 8. Ordem de aplicação das regras
 
-<Quando duas regras incidem sobre a mesma despesa, qual vale primeiro? A ordem
-muda o resultado. Declarar isso separa spec boa de spec média.>
+O cálculo ocorre em duas fases. Uma despesa é **elegível** quando não é recusada por nenhuma regra da fase 1; só despesas elegíveis participam da fase 2.
+
+**Fase 1 — elegibilidade.** Toda despesa é avaliada por **todas** as regras abaixo, mesmo que já tenha falhado em uma anterior. Se falhar em qualquer uma, é recusada (reembolso R$ 0,00) e a saída lista **todos** os motivos, na ordem da tabela.
+
+| # | Etapa | Regra | Motivo de recusa |
+|---|---|---|---|
+| 1 | Normaliza a categoria e verifica se é reembolsável | RN-009 | "categoria fora da política" |
+| 2 | Verifica se o valor é positivo | RN-005 | "valor não positivo" |
+| 3 | Verifica se a data está no período | RN-003 | "fora do período de competência" |
+| 4 | Detecta duplicatas, comparando a categoria **já normalizada** | RN-004 | "duplicata de `<id>`" |
+| 5 | Verifica nota fiscal acima de R$ 100,00 | RN-002 | "nota fiscal ausente" |
+
+Como duplicatas têm todos os campos iguais, elas sempre têm o mesmo resultado nas etapas 1, 2, 3 e 5; por isso a etapa 4 pode considerar todas as despesas da entrada.
+
+**Fase 2 — valor reembolsado** (apenas despesas elegíveis):
+
+| # | Etapa | Regra |
+|---|---|---|
+| 6 | Determina as datas em viagem a partir das hospedagens elegíveis | RN-007 |
+| 7 | Aplica o limite de hospedagem por diária | RN-006 |
+| 8 | Aplica o limite diário de alimentação e transporte urbano, ampliado nas datas em viagem | RN-001, RN-007 |
+| 9 | Arredonda o reembolso de cada despesa | RN-008 |
+
+**Aceite:**
+- Despesa de alimentação em 15/04 (fora do período), R$ 150,00, sem nota → recusada com os motivos "fora do período de competência" e "nota fiscal ausente", nessa ordem.
+- `ALIMENTACAO` e `alimentacao` com todos os demais campos iguais → duplicatas (a de maior `id` é recusada).
+- Hospedagem sem nota acima de R$ 100,00 → recusada na fase 1 e, portanto, não gera datas em viagem na etapa 6.
 
 ## 9. Critérios de aceite
 
