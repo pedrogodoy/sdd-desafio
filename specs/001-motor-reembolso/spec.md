@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.0 · **Status:** rascunho · **Última alteração:** `<data>`
+**Versão:** 1.0 · **Status:** aprovada · **Última alteração:** 2026-11-06
 
 > **Regra de ouro deste arquivo:** ele descreve o QUÊ e o PORQUÊ. Nenhuma linha
 > aqui pode citar linguagem, biblioteca, classe, função ou estrutura de pasta.
@@ -13,20 +13,23 @@
 
 ## 1. Problema
 
-<Duas ou três frases. Quem sofre hoje, com o quê, e por quê isso custa caro.>
+Hoje o financeiro confere manualmente, item por item, as despesas de cada colaborador contra a política de reembolso do RH. O processo é lento e inconsistente: a política tem redação ambígua, e duas pessoas conferindo a mesma planilha chegam a valores diferentes sem conseguir explicar por quê.
 
 ## 2. Objetivo
 
-<Uma frase. O que passa a ser verdade quando isto existir.>
+Dado o conjunto de despesas de um colaborador num período de competência, calcular de forma determinística quanto é reembolsável em cada despesa e justificar cada decisão com base em regras escritas nesta spec.
 
 ## 3. Fora de escopo
 
-<Lista explícita. Este bloco vale ponto: ele impede o agente de inventar feature
-e impede você de mover a trave depois.>
-
 - Não controla prazo de entrega de nota fiscal nem mantém despesas em estado "pendente"; uma despesa recusada por falta de nota só é reavaliada se for lançada novamente em um novo cálculo (AMB-006).
 - Não aplica restrição por dia da semana nem por feriado (AMB-014).
-- Não faz `<...>`
+- Não aprova, paga nem registra o reembolso: apenas calcula e justifica.
+- Não guarda histórico entre cálculos: cada execução considera somente a entrada recebida (não detecta duplicatas nem limites entre períodos ou execuções diferentes).
+- Não busca a despesa original de um estorno nem abate créditos (AMB-009).
+- Não valida a autenticidade ou o conteúdo da nota fiscal; confia no campo `tem_nota_fiscal`.
+- Não trata moeda estrangeira: todos os valores são em reais.
+- Não processa mais de um colaborador ou mais de um período por execução.
+- Não interpreta a descrição da despesa, exceto para extrair o número de diárias de hospedagem (RN-006).
 
 ## 4. Entrada e saída
 
@@ -63,7 +66,7 @@ Entrada que não segue este formato (campo obrigatório ausente, tipo errado, da
 | `despesas[].categoria` | texto | categoria **normalizada** (RN-009) |
 | `despesas[].valor_original` | número | `valor` exatamente como veio na entrada |
 | `despesas[].valor_reembolsado` | número | valor a reembolsar, com 2 casas (RN-008); R$ 0,00 se recusada |
-| `despesas[].status` | texto | `integral` (reembolsado = original), `parcial` (0 < reembolsado < original) ou `recusada` |
+| `despesas[].status` | texto | `recusada` se falhou na fase 1 (seção 8); `parcial` se o valor foi cortado por limite; `integral` caso contrário. A diferença causada apenas pelo arredondamento (RN-008) não torna a despesa parcial (ex.: R$ 33,333 → R$ 33,33 é `integral`). |
 | `despesas[].motivos` | lista de textos | vazia se `integral`; se `parcial`, "limite diário excedido" ou "limite de hospedagem excedido"; se `recusada`, todos os motivos da fase 1 (seção 8) |
 | `despesas[].limite_aplicado` | número ou nulo | limite que valeu para a despesa: diário da categoria (60, 90, 80 ou 120) ou de hospedagem (N × 375); nulo se recusada |
 | `despesas[].em_viagem` | booleano | se a data da despesa é uma data em viagem (RN-007) |
@@ -201,15 +204,11 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 - `Alimentação` (com acento e inicial maiúscula) → tratada como `alimentacao`.
 - `transporte urbano` (espaço no lugar do sublinhado) → recusada como "categoria fora da política".
 
-### RN-010 — ...
-
 ---
 
 ## 6. Ambiguidades identificadas e decisões
 
-> **Esta seção é o coração da spec e vale a maior parte dos 25 pontos do critério 1.**
-> Uma ambiguidade que você resolveu no código sem registrar aqui conta como
-> não resolvida.
+Cada item registra um ponto em que a política do RH admite mais de uma leitura, a leitura adotada e o motivo.
 
 ### AMB-001 — Unidade de aplicação do limite diário
 
@@ -324,16 +323,30 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 **Justificativa:** criar uma restrição seria inventar uma regra que o RH não escreveu; plantão e viagem em fim de semana são situações legítimas.
 **Regra afetada:** nenhuma (RN-001 aplica-se a qualquer data). Aceite: d-012 recebe R$ 47,20 (integral).
 
-<A política tem no mínimo oito. Se você achou menos, releia
-`exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
-
 ---
 
 ## 7. Casos de borda
 
+Resultado esperado para `exemplos/despesas-exemplo.json` (competência 2026-07, período 01/07 a 31/07). Datas em viagem: 14/07, 15/07 e 16/07 (geradas por d-010).
+
 | Caso | Entrada | Comportamento esperado | Regra |
 |---|---|---|---|
-| | | | |
+| d-001 — dois itens no dia, soma acima do limite | alimentação, 03/07, R$ 72,50, com nota | **parcial**, R$ 22,00 (recebe o saldo depois de d-002); limite 60 | RN-001 |
+| d-002 — item menor do dia é pago primeiro | alimentação, 03/07, R$ 38,00, com nota | **integral**, R$ 38,00; limite 60 | RN-001 |
+| d-003 — exatamente R$ 100,00 sem nota | transporte, 06/07, R$ 100,00, sem nota | não exige nota; **parcial**, R$ 80,00; limite 80 | RN-002, RN-001 |
+| d-004 — R$ 0,01 acima da fronteira, sem nota | transporte, 06/07, R$ 100,01, sem nota | **recusada**, "nota fiscal ausente"; não consome o limite de 06/07 | RN-002 |
+| d-005 — categoria não prevista | coworking, 07/07, R$ 89,00 | **recusada**, "categoria fora da política" | RN-009 |
+| d-006 — original de um par duplicado | alimentação, 09/07, R$ 54,90 | **integral**, R$ 54,90; limite 60 | RN-004, RN-001 |
+| d-007 — cópia exata de d-006 | alimentação, 09/07, R$ 54,90 | **recusada**, "duplicata de d-006" | RN-004 |
+| d-008 — data fora do período | alimentação, 15/04, R$ 41,00 | **recusada**, "fora do período de competência" | RN-003 |
+| d-009 — estorno (valor negativo) | transporte, 11/07, −R$ 45,00 | **recusada**, "valor não positivo"; não abate nenhum total | RN-005 |
+| d-010 — hospedagem com 2 diárias na descrição | hospedagem, 14/07, R$ 480,00, com nota, "2 diarias" | N = 2; **integral**, R$ 480,00; limite 750; em viagem | RN-006, RN-007 |
+| d-011 — mais de 2 casas decimais, em viagem | alimentação, 15/07, R$ 33,333 | **integral**, R$ 33,33; limite 90; em viagem | RN-008, RN-007 |
+| d-012 — sábado | alimentação, 18/07, R$ 47,20 | **integral**, R$ 47,20; limite 60 | AMB-014, RN-001 |
+| d-013 — hospedagem sem nota | hospedagem, 22/07, R$ 690,00, sem nota, "3 noites" | **recusada**, "nota fiscal ausente"; não gera datas em viagem | RN-002, RN-007 |
+| d-014 — categoria em maiúsculas, último dia do período | `ALIMENTACAO`, 31/07, R$ 61,00 | categoria `alimentacao`; **parcial**, R$ 60,00; limite 60 | RN-009, RN-003, RN-001 |
+
+**Totais esperados:** `valor_reembolsado` = **R$ 815,43**; integral 5, parcial 3, recusada 6.
 
 ## 8. Ordem de aplicação das regras
 
@@ -369,12 +382,16 @@ Como duplicatas têm todos os campos iguais, elas sempre têm o mesmo resultado 
 
 O sistema está pronto quando:
 
-- [ ] <critério verificável, sem ler código>
-- [ ] <...>
+- [ ] Executado com `exemplos/despesas-exemplo.json`, produz exatamente os resultados por despesa e os totais da seção 7.
+- [ ] Todos os casos listados em **Aceite** de RN-001 a RN-009 e da seção 8 produzem o resultado descrito.
+- [ ] A saída segue o schema da seção 4: todos os campos presentes, despesas na ordem da entrada, `totais.valor_reembolsado` igual à soma dos `valor_reembolsado`.
+- [ ] Toda despesa `recusada` tem `valor_reembolsado` R$ 0,00 e pelo menos um motivo; toda despesa `parcial` tem exatamente um motivo; toda despesa `integral` tem a lista de motivos vazia.
+- [ ] Executar duas vezes a mesma entrada produz saídas idênticas, e reordenar as despesas na entrada não altera nenhum `valor_reembolsado`.
+- [ ] Entrada fora do formato da seção 4 não gera saída e informa o erro.
+- [ ] Entrada com lista de despesas vazia gera saída com `despesas` vazio e totais zerados.
 
 ## 10. O que fica em aberto
 
-<Perguntas que você não conseguiu responder e a decisão provisória que tomou.
-Honestidade aqui vale ponto — spec que finge não ter buraco é spec que esconde buraco.>
-
 - **Compras legítimas idênticas são tratadas como duplicata.** Duas despesas reais com todos os campos iguais (ex.: dois cafés de R$ 8,00, mesma descrição, mesma padaria, mesmo dia) não podem ser distinguidas, porque a entrada não traz horário nem número da nota. **Decisão provisória:** aplica-se AMB-008 — a segunda é recusada como duplicata. O colaborador pode relançá-la com descrição que a diferencie. Resolver de verdade exige um identificador da nota na entrada.
+- **Viagem sem hospedagem não é detectada.** Uma viagem de ida e volta no mesmo dia, sem pernoite, não gera datas em viagem (RN-007), e os limites não são ampliados. **Decisão provisória:** aceita-se a limitação; resolver exige um campo de viagem na entrada.
+- **O limite de R$ 250,00 por diária nunca é aplicado isoladamente.** Consequência de AMB-011: toda hospedagem caracteriza viagem, então o limite efetivo é sempre R$ 375,00. **Decisão provisória:** mantido; se o RH esclarecer que a ampliação não vale para a própria hospedagem, basta alterar RN-006.
