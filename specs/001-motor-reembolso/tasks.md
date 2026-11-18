@@ -22,9 +22,9 @@
 - [x] **T-002** — Cria `src/modelo.ts` (tipos do plan §3) e `src/politica.ts` (limites, fator de viagem, limiar de nota, categorias, textos de motivo, palavras de diária).
   - **Atende:** plan §3, plan §4; valores de RN-001, RN-002, RN-006, RN-007, RN-009
   - **Aceite:** `tests/politica.test.ts` — confere cada constante contra o número/texto escrito na spec (60, 80, 250, 1,5, 100; três categorias; motivos da spec §4).
-  - **Commit:**
+  - **Commit:** `696085e`
 
-- [ ] **T-003** — Valida a entrada e converte para o modelo interno (`src/entrada.ts`), com valores em `Decimal` (DT-001, DT-002).
+- [x] **T-003** — Valida a entrada e converte para o modelo interno (`src/entrada.ts`), com valores em `Decimal` (DT-001, DT-002).
   - **Atende:** spec §4 (entrada e rejeição de entrada malformada)
   - **Aceite:** `tests/entrada.test.ts` — aceita `exemplos/despesas-exemplo.json`; aceita lista de despesas vazia; rejeita, com mensagem que cita o campo: campo obrigatório ausente, tipo errado, data inválida, `id` repetido; `33.333` vira `Decimal('33.333')`.
   - **Commit:**
