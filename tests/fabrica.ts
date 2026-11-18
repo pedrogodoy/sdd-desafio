@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 import { Decimal } from 'decimal.js';
 import { interpretarEntrada } from '../src/entrada.js';
 import type { Despesa, Entrada } from '../src/modelo.js';
+import type { CategoriaComLimiteDiario } from '../src/politica.js';
+import { normalizarCategoria } from '../src/regras/categoria.js';
+import type { ItemLimiteDiario } from '../src/regras/limite-diario.js';
 
 let sequencia = 0;
 
@@ -38,4 +41,9 @@ export function doExemplo(id: string): Despesa {
   const encontrada = entradaDoExemplo().despesas.find((d) => d.id === id);
   if (!encontrada) throw new Error(`despesa ${id} não existe no exemplo`);
   return encontrada;
+}
+
+/** Itens para aplicarLimiteDiario a partir de despesas já elegíveis. */
+export function itensLimite(despesas: Despesa[]): ItemLimiteDiario[] {
+  return despesas.map((d) => ({ despesa: d, categoria: normalizarCategoria(d.categoria) as CategoriaComLimiteDiario }));
 }

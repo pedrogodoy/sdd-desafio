@@ -71,9 +71,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-011** — Datas em viagem a partir das hospedagens elegíveis (`regras/viagem.ts`).
   - **Atende:** RN-007, AMB-011
   - **Aceite:** `tests/rn-007-viagem.test.ts` passa (d-010 → 14, 15 e 16/07; hospedagem recusada não gera datas; sobreposição não acumula).
-  - **Commit:**
+  - **Commit:** `f6c5afb`
 
-- [ ] **T-012** — Limite diário por categoria com distribuição do menor para o maior e limite ampliado em viagem (`regras/limite-diario.ts`).
+- [x] **T-012** — Limite diário por categoria com distribuição do menor para o maior e limite ampliado em viagem (`regras/limite-diario.ts`).
   - **Atende:** RN-001, RN-007, AMB-001, AMB-002, AMB-003
   - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa (03/07 → d-002 38, d-001 22; 61 → 60; 60 → 60 integral; categorias independentes; empate por `id`) e os casos de limite ampliado da RN-007 (85 em 16/07 integral; 85 em 17/07 → 60).
   - **Commit:**
