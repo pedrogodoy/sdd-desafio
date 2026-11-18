@@ -61,9 +61,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-009** — Arredondamento meio para o par (`regras/arredondamento.ts`).
   - **Atende:** RN-008, AMB-012
   - **Aceite:** `tests/rn-008-arredondamento.test.ts` passa (33,333 → 33,33; 10,125 → 10,12; 10,135 → 10,14).
-  - **Commit:**
+  - **Commit:** `1586636`
 
-- [ ] **T-010** — Número de diárias e limite de hospedagem (`regras/hospedagem.ts`).
+- [x] **T-010** — Número de diárias e limite de hospedagem (`regras/hospedagem.ts`).
   - **Atende:** RN-006, AMB-010, AMB-011 (limite sempre ampliado), DT-005
   - **Aceite:** `tests/rn-006-hospedagem.test.ts` passa (d-010 N=2 integral 480; 800 com 2 diárias → 750; "Pousada" 400 → 375; "duas diarias" → N=1).
   - **Commit:**
