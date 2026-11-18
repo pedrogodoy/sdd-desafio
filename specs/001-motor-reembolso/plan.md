@@ -80,8 +80,7 @@ type Categoria = 'alimentacao' | 'transporte_urbano' | 'hospedagem';
 interface Despesa {              // após validação da entrada
   id: string;
   data: string;                  // AAAA-MM-DD (comparável como texto)
-  categoriaInformada: string;    // como veio
-  categoriaNormalizada: string;  // RN-009 (pode não ser uma Categoria)
+  categoria: string;             // como veio; a normalização (RN-009) é feita pelo motor
   descricao: string;
   fornecedor: string;
   valor: Decimal;                // exato, nunca arredondado
@@ -91,6 +90,7 @@ interface Despesa {              // após validação da entrada
 
 interface Avaliacao {            // resultado por despesa, antes da saída
   despesa: Despesa;
+  categoria: string;             // normalizada (RN-009); pode não ser uma Categoria
   motivosRecusa: string[];       // fase 1; vazio = elegível
   reembolsoExato: Decimal;       // fase 2, antes de RN-008
   cortadaPorLimite: boolean;     // define 'parcial' (spec §4, status)
@@ -100,6 +100,8 @@ interface Avaliacao {            // resultado por despesa, antes da saída
   diarias: number | null;
 }
 ```
+
+A `Despesa` guarda só o que veio na entrada; tudo o que é resultado de regra — inclusive a categoria normalizada — fica na `Avaliacao`. Assim `entrada.ts` (T-003) não depende de nenhuma regra.
 
 O `status` é derivado: `recusada` se `motivosRecusa` não está vazio; `parcial` se `cortadaPorLimite`; senão `integral`. Ele é calculado a partir do valor exato, não do arredondado, como a spec exige.
 
