@@ -51,9 +51,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-007** — Detecção de duplicatas (`regras/duplicata.ts`), comparando categoria normalizada.
   - **Atende:** RN-004, AMB-008
   - **Aceite:** `tests/rn-004-duplicata.test.ts` passa (d-007 "duplicata de d-006"; descrição diferente não é duplicata; trio mantém o menor `id`; `ALIMENTACAO` × `alimentacao` são duplicatas).
-  - **Commit:**
+  - **Commit:** `62ea337`
 
-- [ ] **T-008** — Verificação de nota fiscal (`regras/nota-fiscal.ts`).
+- [x] **T-008** — Verificação de nota fiscal (`regras/nota-fiscal.ts`).
   - **Atende:** RN-002, AMB-004, AMB-005, AMB-006
   - **Aceite:** `tests/rn-002-nota-fiscal.test.ts` passa (100,00 sem nota aceita; 100,01 sem nota recusada; 150,00 com nota aceita; 100,004 sem nota recusada).
   - **Commit:**
