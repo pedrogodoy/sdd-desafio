@@ -17,9 +17,9 @@
 - [x] **T-001** — Inicializa o projeto: `package.json` com dependências do plan §1, `tsconfig.json`, scripts `reembolso`, `test` e `typecheck`.
   - **Atende:** plan §1
   - **Aceite:** `npm test` executa e passa `tests/setup.test.ts` (teste trivial); `npm run typecheck` termina sem erros.
-  - **Commit:**
+  - **Commit:** `7800958`
 
-- [ ] **T-002** — Cria `src/modelo.ts` (tipos do plan §3) e `src/politica.ts` (limites, fator de viagem, limiar de nota, categorias, textos de motivo, palavras de diária).
+- [x] **T-002** — Cria `src/modelo.ts` (tipos do plan §3) e `src/politica.ts` (limites, fator de viagem, limiar de nota, categorias, textos de motivo, palavras de diária).
   - **Atende:** plan §3, plan §4; valores de RN-001, RN-002, RN-006, RN-007, RN-009
   - **Aceite:** `tests/politica.test.ts` — confere cada constante contra o número/texto escrito na spec (60, 80, 250, 1,5, 100; três categorias; motivos da spec §4).
   - **Commit:**
