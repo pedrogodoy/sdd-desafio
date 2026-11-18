@@ -56,9 +56,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-008** — Verificação de nota fiscal (`regras/nota-fiscal.ts`).
   - **Atende:** RN-002, AMB-004, AMB-005, AMB-006
   - **Aceite:** `tests/rn-002-nota-fiscal.test.ts` passa (100,00 sem nota aceita; 100,01 sem nota recusada; 150,00 com nota aceita; 100,004 sem nota recusada).
-  - **Commit:**
+  - **Commit:** `421fa4e`
 
-- [ ] **T-009** — Arredondamento meio para o par (`regras/arredondamento.ts`).
+- [x] **T-009** — Arredondamento meio para o par (`regras/arredondamento.ts`).
   - **Atende:** RN-008, AMB-012
   - **Aceite:** `tests/rn-008-arredondamento.test.ts` passa (33,333 → 33,33; 10,125 → 10,12; 10,135 → 10,14).
   - **Commit:**
