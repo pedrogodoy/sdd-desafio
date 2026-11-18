@@ -27,13 +27,13 @@
 - [x] **T-003** — Valida a entrada e converte para o modelo interno (`src/entrada.ts`), com valores em `Decimal` (DT-001, DT-002).
   - **Atende:** spec §4 (entrada e rejeição de entrada malformada)
   - **Aceite:** `tests/entrada.test.ts` — aceita `exemplos/despesas-exemplo.json`; aceita lista de despesas vazia; rejeita, com mensagem que cita o campo: campo obrigatório ausente, tipo errado, data inválida, `id` repetido; `33.333` vira `Decimal('33.333')`.
-  - **Commit:**
+  - **Commit:** `ca4b491`
 
 ## Fase 2 — Regras de negócio
 
 Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduzem literalmente os casos de **Aceite** da RN na spec.
 
-- [ ] **T-004** — Normalização e verificação de categoria (`regras/categoria.ts`).
+- [x] **T-004** — Normalização e verificação de categoria (`regras/categoria.ts`).
   - **Atende:** RN-009, AMB-013
   - **Aceite:** `tests/rn-009-categoria.test.ts` passa (d-005 recusada; `ALIMENTACAO` e `Alimentação` → `alimentacao`; `transporte urbano` recusada).
   - **Commit:**
