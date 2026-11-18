@@ -66,9 +66,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-010** — Número de diárias e limite de hospedagem (`regras/hospedagem.ts`).
   - **Atende:** RN-006, AMB-010, AMB-011 (limite sempre ampliado), DT-005
   - **Aceite:** `tests/rn-006-hospedagem.test.ts` passa (d-010 N=2 integral 480; 800 com 2 diárias → 750; "Pousada" 400 → 375; "duas diarias" → N=1).
-  - **Commit:**
+  - **Commit:** `c498171`
 
-- [ ] **T-011** — Datas em viagem a partir das hospedagens elegíveis (`regras/viagem.ts`).
+- [x] **T-011** — Datas em viagem a partir das hospedagens elegíveis (`regras/viagem.ts`).
   - **Atende:** RN-007, AMB-011
   - **Aceite:** `tests/rn-007-viagem.test.ts` passa (d-010 → 14, 15 e 16/07; hospedagem recusada não gera datas; sobreposição não acumula).
   - **Commit:**
