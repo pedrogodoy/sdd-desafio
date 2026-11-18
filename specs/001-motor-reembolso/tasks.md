@@ -46,9 +46,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-006** — Verificação de período de competência (`regras/periodo.ts`).
   - **Atende:** RN-003, AMB-007
   - **Aceite:** `tests/rn-003-periodo.test.ts` passa (d-008 recusada; 01/07 e 31/07 elegíveis; 01/08 recusada).
-  - **Commit:**
+  - **Commit:** `7bb917b`
 
-- [ ] **T-007** — Detecção de duplicatas (`regras/duplicata.ts`), comparando categoria normalizada.
+- [x] **T-007** — Detecção de duplicatas (`regras/duplicata.ts`), comparando categoria normalizada.
   - **Atende:** RN-004, AMB-008
   - **Aceite:** `tests/rn-004-duplicata.test.ts` passa (d-007 "duplicata de d-006"; descrição diferente não é duplicata; trio mantém o menor `id`; `ALIMENTACAO` × `alimentacao` são duplicatas).
   - **Commit:**
