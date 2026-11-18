@@ -36,9 +36,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-004** — Normalização e verificação de categoria (`regras/categoria.ts`).
   - **Atende:** RN-009, AMB-013
   - **Aceite:** `tests/rn-009-categoria.test.ts` passa (d-005 recusada; `ALIMENTACAO` e `Alimentação` → `alimentacao`; `transporte urbano` recusada).
-  - **Commit:**
+  - **Commit:** `f071ec6`
 
-- [ ] **T-005** — Verificação de valor não positivo (`regras/valor.ts`).
+- [x] **T-005** — Verificação de valor não positivo (`regras/valor.ts`).
   - **Atende:** RN-005, AMB-009
   - **Aceite:** `tests/rn-005-valor-nao-positivo.test.ts` passa (d-009 −45 recusada; 0 recusada; positivo aceito).
   - **Commit:**
