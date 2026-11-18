@@ -41,9 +41,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-005** — Verificação de valor não positivo (`regras/valor.ts`).
   - **Atende:** RN-005, AMB-009
   - **Aceite:** `tests/rn-005-valor-nao-positivo.test.ts` passa (d-009 −45 recusada; 0 recusada; positivo aceito).
-  - **Commit:**
+  - **Commit:** `57df3cd`
 
-- [ ] **T-006** — Verificação de período de competência (`regras/periodo.ts`).
+- [x] **T-006** — Verificação de período de competência (`regras/periodo.ts`).
   - **Atende:** RN-003, AMB-007
   - **Aceite:** `tests/rn-003-periodo.test.ts` passa (d-008 recusada; 01/07 e 31/07 elegíveis; 01/08 recusada).
   - **Commit:**
