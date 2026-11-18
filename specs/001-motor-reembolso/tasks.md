@@ -8,7 +8,7 @@
 
 **Formato do commit:** `feat(T-003): <descrição>` · `test(T-003): <descrição>`
 
-**Baseado em:** spec 1.0 · plan 1.0
+**Baseado em:** spec 1.1 · plan 1.0
 
 ---
 

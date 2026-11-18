@@ -10,33 +10,16 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
-## D-002 — <título curto> · `<data>`
+## D-001 — Coerência do período fica em aberto · `2026-11-18`
 
-**Gatilho:** <o que provocou: envelope lacrado / erro descoberto na implementação /
-ambiguidade que só apareceu ao testar / o Claude apontou uma contradição>
+**Gatilho:** lacuna que só apareceu ao implementar a validação da entrada (T-003): a spec §4 diz quais campos o período tem, mas não se eles precisam ser coerentes entre si.
 
-**O que mudou na spec:** <de → para, citando o ID da regra>
+**O que mudou na spec:** versão 1.0 → 1.1. Nova entrada em §10 ("O que fica em aberto"): a entrada não é rejeitada por `inicio` > `fim` nem por `competencia` incoerente com as datas; só `inicio` e `fim` valem para RN-003. Nenhuma RN mudou.
 
-**Por quê:**
+**Por quê:** a política do RH não diz qual campo prevalece quando discordam. Rejeitar seria criar regra nova sem base; ignorar em silêncio deixaria a lacuna invisível. A opção registrada não altera nenhum resultado da §7 e, no caso extremo (`inicio` > `fim`), recusa tudo com motivo explícito.
 
-**O que isso invalidou:** <requisitos, decisões técnicas, testes que caíram>
+**O que isso invalidou:** nada. `tests/entrada.test.ts` continua valendo.
 
-**Tasks afetadas:** <as que precisaram ser refeitas + as novas criadas>
+**Tasks afetadas:** nenhuma refeita; nenhuma criada.
 
-**Custo:** <quantos arquivos tocados, quanto tempo>
-
----
-
-## D-001 — <título curto> · `<data>`
-
-**Gatilho:**
-
-**O que mudou na spec:**
-
-**Por quê:**
-
-**O que isso invalidou:**
-
-**Tasks afetadas:**
-
-**Custo:**
+**Custo:** 2 arquivos (spec.md, DECISIONS.md), poucos minutos.

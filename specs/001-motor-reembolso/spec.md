@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.0 · **Status:** aprovada · **Última alteração:** 2026-11-06
+**Versão:** 1.1 · **Status:** aprovada · **Última alteração:** 2026-11-18
 
 > **Regra de ouro deste arquivo:** ele descreve o QUÊ e o PORQUÊ. Nenhuma linha
 > aqui pode citar linguagem, biblioteca, classe, função ou estrutura de pasta.
@@ -395,3 +395,4 @@ O sistema está pronto quando:
 - **Compras legítimas idênticas são tratadas como duplicata.** Duas despesas reais com todos os campos iguais (ex.: dois cafés de R$ 8,00, mesma descrição, mesma padaria, mesmo dia) não podem ser distinguidas, porque a entrada não traz horário nem número da nota. **Decisão provisória:** aplica-se AMB-008 — a segunda é recusada como duplicata. O colaborador pode relançá-la com descrição que a diferencie. Resolver de verdade exige um identificador da nota na entrada.
 - **Viagem sem hospedagem não é detectada.** Uma viagem de ida e volta no mesmo dia, sem pernoite, não gera datas em viagem (RN-007), e os limites não são ampliados. **Decisão provisória:** aceita-se a limitação; resolver exige um campo de viagem na entrada.
 - **O limite de R$ 250,00 por diária nunca é aplicado isoladamente.** Consequência de AMB-011: toda hospedagem caracteriza viagem, então o limite efetivo é sempre R$ 375,00. **Decisão provisória:** mantido; se o RH esclarecer que a ampliação não vale para a própria hospedagem, basta alterar RN-006.
+- **Coerência entre `competencia`, `inicio` e `fim` não é verificada.** A entrada é aceita mesmo com `inicio` depois de `fim` ou com uma competência que não corresponde às datas do período (ex.: competência `2026-07` com período de 01/08 a 31/08). A política não diz qual campo prevalece. **Decisão provisória:** só `inicio` e `fim` são usados (RN-003); `competencia` é apenas copiada para a saída. Com `inicio` depois de `fim`, nenhuma data cabe no período e todas as despesas são recusadas por RN-003 — o resultado é visível e auditável, não silencioso.
