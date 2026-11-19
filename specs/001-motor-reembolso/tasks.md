@@ -88,9 +88,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-013** — Motor (`src/motor.ts`): fase 1 com acúmulo de todos os motivos na ordem da spec §8, fase 2 só com elegíveis.
   - **Atende:** spec §8, DT-004
   - **Aceite:** `tests/ordem-aplicacao.test.ts` passa (15/04 + R$ 150 sem nota → dois motivos na ordem; recusada não consome limite; hospedagem recusada não gera viagem e sai com `diarias` nulo (AMB-016); reordenar a entrada não altera valores) e os `it.todo` deixados na Fase 2 viram testes.
-  - **Commit:**
+  - **Commit:** `868dca1`
 
-- [ ] **T-014** — Teste de ponta a ponta do exemplo no nível do motor.
+- [x] **T-014** — Teste de ponta a ponta do exemplo no nível do motor.
   - **Atende:** spec §7
   - **Aceite:** `tests/exemplo-ponta-a-ponta.test.ts` passa — cada uma das 14 despesas com status, valor reembolsado, motivos, limite aplicado, em viagem e diárias da tabela da spec §7.
   - **Commit:**
