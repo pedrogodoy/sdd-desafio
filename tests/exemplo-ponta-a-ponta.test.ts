@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { avaliar, motivosDe, statusDe } from '../src/motor.js';
 import { arredondarReembolso } from '../src/regras/arredondamento.js';
+import { montarSaida } from '../src/saida.js';
 import { entradaDoExemplo } from './fabrica.js';
 
 // Spec §7 — exemplos/despesas-exemplo.json, linha a linha.
@@ -45,5 +46,13 @@ describe('Spec §7 — exemplo de ponta a ponta (motor)', () => {
   it('em viagem só as despesas de 14/07 e 15/07 (dentro de 14–16/07, gerado por d-010; 16/07 não tem despesa)', () => {
     const emViagem = avaliacoes.filter((a) => a.emViagem).map((a) => a.despesa.id);
     expect(emViagem).toEqual(['d-010', 'd-011']);
+  });
+
+  it('totais: R$ 815,43; integral 5, parcial 3, recusada 6', () => {
+    const entrada = entradaDoExemplo();
+    expect(montarSaida(entrada, avaliar(entrada)).totais).toEqual({
+      valor_reembolsado: 815.43,
+      quantidade: { integral: 5, parcial: 3, recusada: 6 },
+    });
   });
 });

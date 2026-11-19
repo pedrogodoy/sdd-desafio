@@ -93,11 +93,11 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-014** — Teste de ponta a ponta do exemplo no nível do motor.
   - **Atende:** spec §7
   - **Aceite:** `tests/exemplo-ponta-a-ponta.test.ts` passa — cada uma das 14 despesas com status, valor reembolsado, motivos, limite aplicado, em viagem e diárias da tabela da spec §7.
-  - **Commit:**
+  - **Commit:** `b5f1242`
 
 ## Fase 4 — Saída e CLI
 
-- [ ] **T-015** — Montagem da saída (`src/saida.ts`): schema da spec §4, ordem da entrada, totais, conversão Decimal → número (DT-003).
+- [x] **T-015** — Montagem da saída (`src/saida.ts`): schema da spec §4, ordem da entrada, totais, conversão Decimal → número (DT-003).
   - **Atende:** spec §4 (saída), RN-008 (totais = soma dos arredondados)
   - **Aceite:** `tests/saida.test.ts` passa (exemplo pequeno da spec §4 idêntico; motivos vazios em integral; `limite_aplicado` nulo em recusada) e `exemplo-ponta-a-ponta.test.ts` passa a conferir totais: R$ 815,43; 5 integral, 3 parcial, 6 recusada.
   - **Commit:**
