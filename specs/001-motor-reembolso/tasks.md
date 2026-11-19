@@ -100,9 +100,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-015** — Montagem da saída (`src/saida.ts`): schema da spec §4, ordem da entrada, totais, conversão Decimal → número (DT-003).
   - **Atende:** spec §4 (saída), RN-008 (totais = soma dos arredondados)
   - **Aceite:** `tests/saida.test.ts` passa (exemplo pequeno da spec §4 idêntico; motivos vazios em integral; `limite_aplicado` nulo em recusada) e `exemplo-ponta-a-ponta.test.ts` passa a conferir totais: R$ 815,43; 5 integral, 3 parcial, 6 recusada.
-  - **Commit:**
+  - **Commit:** `9fcfec5`
 
-- [ ] **T-016** — CLI (`src/cli.ts`): `calcular --input --output`, erro de formato sem gerar saída, código de saída diferente de zero em erro.
+- [x] **T-016** — CLI (`src/cli.ts`): `calcular --input --output`, erro de formato sem gerar saída, código de saída diferente de zero em erro.
   - **Atende:** interface fixa do desafio; spec §9
   - **Aceite:** `tests/cli.test.ts` passa (exemplo gera arquivo igual ao esperado; entrada inválida não cria arquivo e sai com erro; lista vazia gera totais zerados; duas execuções produzem saídas idênticas).
   - **Commit:**
