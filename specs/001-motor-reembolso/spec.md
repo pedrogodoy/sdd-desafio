@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.1 · **Status:** aprovada · **Última alteração:** 2026-11-18
+**Versão:** 1.2 · **Status:** aprovada · **Última alteração:** 2026-11-19
 
 > **Regra de ouro deste arquivo:** ele descreve o QUÊ e o PORQUÊ. Nenhuma linha
 > aqui pode citar linguagem, biblioteca, classe, função ou estrutura de pasta.
@@ -113,15 +113,18 @@ Entrada que não segue este formato (campo obrigatório ausente, tipo errado, da
 
 Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
+**Ordem de `id`** (usada em "menor `id`" e "`id` crescente", AMB-015): dois `id`s são comparados da esquerda para a direita, por trechos. Sequências de algarismos são comparadas pelo valor numérico (`d-9` vem antes de `d-10`); os demais trechos, caractere a caractere, pela posição do caractere na tabela Unicode. Se dois `id`s empatarem nessa comparação (ex.: `d-01` e `d-1`), vale a comparação caractere a caractere do `id` inteiro.
+
 ### RN-001 — Limite diário por categoria (alimentação e transporte urbano)
 
 **Regra:** para cada combinação de data e categoria, soma-se o valor das despesas elegíveis (ver seção 8). Limites: alimentação R$ 60,00; transporte urbano R$ 80,00. Se a soma for menor ou igual ao limite, todas as despesas do grupo são reembolsadas integralmente. Se exceder, o limite é distribuído do menor valor para o maior (desempate por `id` crescente): cada despesa recebe o seu valor integral enquanto houver saldo, a que não couber inteira recebe apenas o saldo restante e as seguintes recebem R$ 0,00. Despesas com reembolso menor que o valor original são marcadas como reembolsadas parcialmente, com o motivo "limite diário excedido".
-**Origem:** política do RH, itens 1, 2 e 4. Decisões AMB-001, AMB-002, AMB-003.
+**Origem:** política do RH, itens 1, 2 e 4. Decisões AMB-001, AMB-002, AMB-003, AMB-015.
 **Aceite:**
 - Alimentação em 03/07: d-001 (R$ 72,50) e d-002 (R$ 38,00) → d-002 recebe R$ 38,00, d-001 recebe R$ 22,00 (parcial); total do dia R$ 60,00.
 - Uma única despesa de alimentação de R$ 61,00 no dia → recebe R$ 60,00 (parcial).
 - Uma única despesa de alimentação de R$ 60,00 no dia → recebe R$ 60,00 (integral).
 - Alimentação R$ 50,00 e transporte R$ 70,00 na mesma data → ambas integrais (limites independentes).
+- Alimentação d-9 (R$ 40,00) e d-10 (R$ 40,00) na mesma data → empate de valor; d-9 vem antes (ordem de `id`) e recebe R$ 40,00; d-10 recebe R$ 20,00 (parcial).
 
 ### RN-002 — Nota fiscal obrigatória acima de R$ 100,00
 
@@ -147,11 +150,12 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 ### RN-004 — Duplicatas
 
 **Regra:** duas ou mais despesas são duplicatas quando todos os campos, exceto `id`, são iguais: `data`, `categoria`, `descricao`, `fornecedor`, `valor` e `tem_nota_fiscal`. Em cada grupo de duplicatas, a despesa de menor `id` segue normalmente para as demais regras; as outras são **recusadas integralmente** (reembolso R$ 0,00), com o motivo "duplicata de `<id mantido>`", e não consomem limite diário.
-**Origem:** política do RH, item 8. Decisão AMB-008.
+**Origem:** política do RH, item 8. Decisões AMB-008, AMB-015.
 **Aceite:**
 - d-006 e d-007 (idênticas) → d-006 segue para o limite e recebe R$ 54,90; d-007 recusada, R$ 0,00, motivo "duplicata de d-006".
 - Duas despesas iguais exceto pela descrição ("Almoço" e "Almoço equipe") → não são duplicatas; ambas seguem para o limite.
 - Três despesas idênticas d-020, d-021, d-022 → d-020 mantida; d-021 e d-022 recusadas como "duplicata de d-020".
+- Duas despesas idênticas d-10 e d-9 → d-9 mantida (ordem de `id`); d-10 recusada como "duplicata de d-9".
 
 ### RN-005 — Valores não positivos
 
@@ -322,6 +326,14 @@ Cada item registra um ponto em que a política do RH admite mais de uma leitura,
 **Decisão:** **sem restrição**; despesas de fim de semana seguem exatamente as mesmas regras dos demais dias.
 **Justificativa:** criar uma restrição seria inventar uma regra que o RH não escreveu; plantão e viagem em fim de semana são situações legítimas.
 **Regra afetada:** nenhuma (RN-001 aplica-se a qualquer data). Aceite: d-012 recebe R$ 47,20 (integral).
+
+### AMB-015 — Ordem de `id` para desempate e duplicatas
+
+**Texto original do RH:** (silêncio) — consequência de AMB-002 e AMB-008, que usam "menor `id`".
+**O que não está claro:** `id` é texto. Comparado caractere a caractere, `d-10` vem antes de `d-9` (porque "1" < "9"); comparado pelo número que contém, `d-9` vem antes. No exemplo todos os `id`s têm três dígitos e as duas leituras coincidem.
+**Decisão:** ordem natural — trechos numéricos pelo valor, o resto caractere a caractere (definição completa no início da seção 5).
+**Justificativa:** é a ordem que uma pessoa espera ao ler os `id`s (d-9 foi lançada antes de d-10); a comparação caractere a caractere daria um resultado que o financeiro não conseguiria explicar.
+**Regra afetada:** RN-001, RN-004
 
 ---
 
