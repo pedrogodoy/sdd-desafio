@@ -26,6 +26,7 @@ independentes:
 | `02-plan-tasks-setup.md` | **repete a 01 inteira** (linhas 1–~2835) e segue até plan, tasks e T-001 (a partir da linha ~2836, "parece que a spec ficou fora do docs") | `/export` | `b6b7741` |
 | `02b-fundacao.md` | escolha do modo de revisão → T-002 e T-003 | **reconstruído do `.jsonl`** da sessão | `ce6bf2f` |
 | `03-regras-motor.md` | revisão da Fundação → T-004 a T-014, T-018, D-001 a D-003 | `/export` | `ce6bf2f` |
+| `04-saida-cli.md` | revisão da fase 3 → T-015 a T-017 (sessão nova) | `/export` | `e3ffefe` |
 
 **Sobreposição 01 → 02.** O `/export` grava a conversa inteira, não só o trecho
 desde o export anterior. Mantive a 02 como saiu, sem cortar a parte repetida.
