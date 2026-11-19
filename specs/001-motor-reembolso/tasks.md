@@ -105,9 +105,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-016** — CLI (`src/cli.ts`): `calcular --input --output`, erro de formato sem gerar saída, código de saída diferente de zero em erro.
   - **Atende:** interface fixa do desafio; spec §9
   - **Aceite:** `tests/cli.test.ts` passa (exemplo gera arquivo igual ao esperado; entrada inválida não cria arquivo e sai com erro; lista vazia gera totais zerados; duas execuções produzem saídas idênticas).
-  - **Commit:**
+  - **Commit:** `92776cc`
 
-- [ ] **T-017** — README do projeto: o que é, como instalar, rodar e testar, onde estão spec/plan/tasks.
+- [x] **T-017** — README do projeto: o que é, como instalar, rodar e testar, onde estão spec/plan/tasks.
   - **Atende:** entrega do desafio
   - **Aceite:** seguindo só o README num clone limpo, `npm install`, `npm test` e o comando de exemplo funcionam.
   - **Commit:**
