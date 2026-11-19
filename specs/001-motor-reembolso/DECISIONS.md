@@ -10,6 +10,22 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-003 — `diarias` nulo para hospedagem recusada · `2026-11-19`
+
+**Gatilho:** ambiguidade encontrada ao implementar T-010: a saída "informa o N considerado", mas d-013 é recusada antes de o N ser aplicado.
+
+**O que mudou na spec:** versão 1.2 → 1.3. Nova AMB-016; §4 (campo `diarias`), RN-006 (texto e aceite de d-013) e §7 (linha de d-013) passam a dizer que hospedagem recusada sai com `diarias` nulo.
+
+**Por quê:** decisão do autor (opção B): sem limite aplicado não há N considerado; coerente com `limite_aplicado` nulo em recusada.
+
+**O que isso invalidou:** nada implementado — motor e saída (T-013, T-015) ainda não existiam. Muda o aceite esperado de d-013 em T-014.
+
+**Tasks afetadas:** aceite de T-013 e T-014 atualizado; nenhuma task nova.
+
+**Custo:** spec, DECISIONS, tasks; nenhum código.
+
+---
+
 ## D-002 — "Menor `id`" passa a usar ordem natural · `2026-11-19`
 
 **Gatilho:** ambiguidade que só apareceu ao implementar T-007 e T-012: a spec dizia "menor `id`" e "`id` crescente" sem definir como comparar textos; a implementação comparava caractere a caractere, o que põe `d-10` antes de `d-9`.

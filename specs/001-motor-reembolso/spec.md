@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.2 · **Status:** aprovada · **Última alteração:** 2026-11-19
+**Versão:** 1.3 · **Status:** aprovada · **Última alteração:** 2026-11-19
 
 > **Regra de ouro deste arquivo:** ele descreve o QUÊ e o PORQUÊ. Nenhuma linha
 > aqui pode citar linguagem, biblioteca, classe, função ou estrutura de pasta.
@@ -70,7 +70,7 @@ Entrada que não segue este formato (campo obrigatório ausente, tipo errado, da
 | `despesas[].motivos` | lista de textos | vazia se `integral`; se `parcial`, "limite diário excedido" ou "limite de hospedagem excedido"; se `recusada`, todos os motivos da fase 1 (seção 8) |
 | `despesas[].limite_aplicado` | número ou nulo | limite que valeu para a despesa: diário da categoria (60, 90, 80 ou 120) ou de hospedagem (N × 375); nulo se recusada |
 | `despesas[].em_viagem` | booleano | se a data da despesa é uma data em viagem (RN-007) |
-| `despesas[].diarias` | inteiro ou nulo | N considerado (RN-006); nulo se não for hospedagem |
+| `despesas[].diarias` | inteiro ou nulo | N considerado (RN-006); nulo se não for hospedagem ou se for recusada (AMB-016) |
 | `totais.valor_reembolsado` | número | soma dos `valor_reembolsado` de todas as despesas |
 | `totais.quantidade.integral` | inteiro | número de despesas com status `integral` |
 | `totais.quantidade.parcial` | inteiro | número de despesas com status `parcial` |
@@ -168,14 +168,14 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
 ### RN-006 — Limite de hospedagem por diária
 
-**Regra:** cada despesa de hospedagem é avaliada isoladamente (não há soma por dia). O número de diárias **N** é obtido da `descricao`: o primeiro número inteiro escrito em algarismos, maior que zero, seguido (com ou sem espaço) de uma das palavras "diária", "diárias", "noite" ou "noites" — sem diferenciar maiúsculas/minúsculas nem acentos. Se não houver esse padrão, N = 1. O limite base é N × R$ 250,00; como toda hospedagem caracteriza viagem (RN-007), o limite aplicado é sempre o ampliado, **N × R$ 375,00**. Acima dele, paga-se o limite e o excedente é cortado (AMB-003). A saída informa o N considerado.
-**Origem:** política do RH, itens 3, 4 e 6. Decisões AMB-003, AMB-010, AMB-011.
+**Regra:** cada despesa de hospedagem é avaliada isoladamente (não há soma por dia). O número de diárias **N** é obtido da `descricao`: o primeiro número inteiro escrito em algarismos, maior que zero, seguido (com ou sem espaço) de uma das palavras "diária", "diárias", "noite" ou "noites" — sem diferenciar maiúsculas/minúsculas nem acentos. Se não houver esse padrão, N = 1. O limite base é N × R$ 250,00; como toda hospedagem caracteriza viagem (RN-007), o limite aplicado é sempre o ampliado, **N × R$ 375,00**. Acima dele, paga-se o limite e o excedente é cortado (AMB-003). A saída informa o N considerado; hospedagem recusada na fase 1 não tem N considerado e sai com `diarias` nulo (AMB-016).
+**Origem:** política do RH, itens 3, 4 e 6. Decisões AMB-003, AMB-010, AMB-011, AMB-016.
 **Aceite:**
 - d-010: "Hotel Rio - 2 diarias", R$ 480,00, com nota → N = 2, limite R$ 750,00 → recebe R$ 480,00 (integral).
 - "Hotel - 2 diarias", R$ 800,00, com nota → limite R$ 750,00 → recebe R$ 750,00 (parcial).
 - "Pousada", R$ 400,00, com nota → sem padrão, N = 1 → recebe R$ 375,00 (parcial).
 - "Hotel duas diarias", R$ 400,00, com nota → número por extenso não é reconhecido, N = 1 → recebe R$ 375,00 (parcial).
-- d-013: "Airbnb 3 noites", R$ 690,00, sem nota → recusada por RN-002 antes do limite (N = 3 não chega a ser aplicado).
+- d-013: "Airbnb 3 noites", R$ 690,00, sem nota → recusada por RN-002 antes do limite (N = 3 não chega a ser aplicado); `diarias` nulo e `limite_aplicado` nulo na saída.
 
 ### RN-007 — Ampliação de limites em viagem
 
@@ -335,6 +335,14 @@ Cada item registra um ponto em que a política do RH admite mais de uma leitura,
 **Justificativa:** é a ordem que uma pessoa espera ao ler os `id`s (d-9 foi lançada antes de d-10); a comparação caractere a caractere daria um resultado que o financeiro não conseguiria explicar.
 **Regra afetada:** RN-001, RN-004
 
+### AMB-016 — Número de diárias de hospedagem recusada
+
+**Texto original do RH:** (silêncio) — consequência de RN-006 e do campo `diarias` da saída.
+**O que não está claro:** a saída informa "o N considerado", mas uma hospedagem recusada na fase 1 nunca chega ao limite. Leituras: (a) mostrar o N lido da descrição; (b) mostrar nulo, como o `limite_aplicado`. Exemplo: d-013, "Airbnb 3 noites", recusada por falta de nota.
+**Decisão:** `diarias` é **nulo** para hospedagem recusada.
+**Justificativa:** o N só existe para calcular o limite; despesa recusada não tem limite aplicado, e mostrar 3 sugeriria que as diárias foram consideradas no cálculo.
+**Regra afetada:** RN-006 (saída)
+
 ---
 
 ## 7. Casos de borda
@@ -355,7 +363,7 @@ Resultado esperado para `exemplos/despesas-exemplo.json` (competência 2026-07, 
 | d-010 — hospedagem com 2 diárias na descrição | hospedagem, 14/07, R$ 480,00, com nota, "2 diarias" | N = 2; **integral**, R$ 480,00; limite 750; em viagem | RN-006, RN-007 |
 | d-011 — mais de 2 casas decimais, em viagem | alimentação, 15/07, R$ 33,333 | **integral**, R$ 33,33; limite 90; em viagem | RN-008, RN-007 |
 | d-012 — sábado | alimentação, 18/07, R$ 47,20 | **integral**, R$ 47,20; limite 60 | AMB-014, RN-001 |
-| d-013 — hospedagem sem nota | hospedagem, 22/07, R$ 690,00, sem nota, "3 noites" | **recusada**, "nota fiscal ausente"; não gera datas em viagem | RN-002, RN-007 |
+| d-013 — hospedagem sem nota | hospedagem, 22/07, R$ 690,00, sem nota, "3 noites" | **recusada**, "nota fiscal ausente"; não gera datas em viagem; diárias nulo | RN-002, RN-007, AMB-016 |
 | d-014 — categoria em maiúsculas, último dia do período | `ALIMENTACAO`, 31/07, R$ 61,00 | categoria `alimentacao`; **parcial**, R$ 60,00; limite 60 | RN-009, RN-003, RN-001 |
 
 **Totais esperados:** `valor_reembolsado` = **R$ 815,43**; integral 5, parcial 3, recusada 6.
