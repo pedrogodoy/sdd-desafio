@@ -51,7 +51,7 @@ src/
   entrada.ts          # schema zod + conversão para o modelo interno
   politica.ts         # todos os números e textos da política (seção 4)
   modelo.ts           # tipos da seção 3
-  texto.ts            # normalização minúsculas/sem acento (usada por RN-009 e RN-006)
+  texto.ts            # normalização minúsculas/sem acento (RN-009, RN-006) e ordem natural de id (AMB-015)
   motor.ts            # orquestração das fases
   regras/
     categoria.ts      # RN-009

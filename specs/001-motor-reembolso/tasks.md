@@ -8,7 +8,7 @@
 
 **Formato do commit:** `feat(T-003): <descrição>` · `test(T-003): <descrição>`
 
-**Baseado em:** spec 1.1 · plan 1.0
+**Baseado em:** spec 1.3 · plan 1.0
 
 ---
 
@@ -78,11 +78,16 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
   - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa (03/07 → d-002 38, d-001 22; 61 → 60; 60 → 60 integral; categorias independentes; empate por `id`) e os casos de limite ampliado da RN-007 (85 em 16/07 integral; 85 em 17/07 → 60).
   - **Commit:**
 
+- [ ] **T-018** — Ordem natural de `id` (`src/texto.ts`) usada no desempate do limite diário e na escolha da duplicata mantida. *Criada em D-002.*
+  - **Atende:** spec §5 (Ordem de `id`), AMB-015; altera o comportamento entregue em T-007 e T-012
+  - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa o caso d-9 × d-10 (d-9 recebe 40,00, d-10 recebe 20,00); `tests/rn-004-duplicata.test.ts` passa o caso d-10 × d-9 (d-9 mantida); `tests/texto.test.ts` cobre a comparação (d-9 < d-10, d-01 × d-1, trechos de texto).
+  - **Commit:**
+
 ## Fase 3 — Orquestração e casos de borda
 
 - [ ] **T-013** — Motor (`src/motor.ts`): fase 1 com acúmulo de todos os motivos na ordem da spec §8, fase 2 só com elegíveis.
   - **Atende:** spec §8, DT-004
-  - **Aceite:** `tests/ordem-aplicacao.test.ts` passa (15/04 + R$ 150 sem nota → dois motivos na ordem; recusada não consome limite; hospedagem recusada não gera viagem; reordenar a entrada não altera valores).
+  - **Aceite:** `tests/ordem-aplicacao.test.ts` passa (15/04 + R$ 150 sem nota → dois motivos na ordem; recusada não consome limite; hospedagem recusada não gera viagem e sai com `diarias` nulo (AMB-016); reordenar a entrada não altera valores) e os `it.todo` deixados na Fase 2 viram testes.
   - **Commit:**
 
 - [ ] **T-014** — Teste de ponta a ponta do exemplo no nível do motor.
@@ -120,10 +125,10 @@ não reinicie e não renumere as antigas: a numeração é o eixo da rastreabili
 
 | Regra da spec | Task | Teste |
 |---|---|---|
-| RN-001 | T-012 | `tests/rn-001-limite-diario.test.ts` |
+| RN-001 | T-012, T-018 | `tests/rn-001-limite-diario.test.ts` |
 | RN-002 | T-008 | `tests/rn-002-nota-fiscal.test.ts` |
 | RN-003 | T-006 | `tests/rn-003-periodo.test.ts` |
-| RN-004 | T-007 | `tests/rn-004-duplicata.test.ts` |
+| RN-004 | T-007, T-018 | `tests/rn-004-duplicata.test.ts` |
 | RN-005 | T-005 | `tests/rn-005-valor-nao-positivo.test.ts` |
 | RN-006 | T-010 | `tests/rn-006-hospedagem.test.ts` |
 | RN-007 | T-011, T-012 | `tests/rn-007-viagem.test.ts`, `tests/rn-001-limite-diario.test.ts` |
@@ -139,6 +144,8 @@ não reinicie e não renumere as antigas: a numeração é o eixo da rastreabili
 | AMB-012 | T-009 | `tests/rn-008-arredondamento.test.ts` |
 | AMB-013 | T-004 | `tests/rn-009-categoria.test.ts` |
 | AMB-014 | T-014 | `tests/exemplo-ponta-a-ponta.test.ts` (d-012) |
+| AMB-015 | T-018 | `tests/texto.test.ts`, `tests/rn-001-limite-diario.test.ts`, `tests/rn-004-duplicata.test.ts` |
+| AMB-016 | T-013, T-014 | `tests/ordem-aplicacao.test.ts`, `tests/exemplo-ponta-a-ponta.test.ts` (d-013) |
 | Spec §4 (entrada) | T-003 | `tests/entrada.test.ts` |
 | Spec §4 (saída) | T-015 | `tests/saida.test.ts` |
 | Spec §7 | T-014, T-015 | `tests/exemplo-ponta-a-ponta.test.ts` |
