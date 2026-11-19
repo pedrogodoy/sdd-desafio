@@ -10,6 +10,46 @@
 
 ---
 
+## Registro das sessões (`docs/sessions/`)
+
+*Como ler os exports e onde estão as lacunas e sobreposições — declaradas aqui
+em vez de corrigidas por reescrita (FAQ: "histórico honesto imperfeito vale mais
+que histórico reescrito").*
+
+Todo o trabalho até agora aconteceu em **uma única conversa contínua** do Claude
+Code, exportada em pontos de parada. Por isso os arquivos não são sessões
+independentes:
+
+| Arquivo | Cobre | Como foi gerado | Commit |
+|---|---|---|---|
+| `01-especificacao.md` | início → spec v1.0 aprovada | `/export` | `fcfb72a` |
+| `02-plan-tasks-setup.md` | **repete a 01 inteira** (linhas 1–~2835) e segue até plan, tasks e T-001 (a partir da linha ~2836, "parece que a spec ficou fora do docs") | `/export` | `b6b7741` |
+| `02b-fundacao.md` | escolha do modo de revisão → T-002 e T-003 | **reconstruído do `.jsonl`** da sessão | `ce6bf2f` |
+| `03-regras-motor.md` | revisão da Fundação → T-004 a T-014, T-018, D-001 a D-003 | `/export` | `ce6bf2f` |
+
+**Sobreposição 01 → 02.** O `/export` grava a conversa inteira, não só o trecho
+desde o export anterior. Mantive a 02 como saiu, sem cortar a parte repetida.
+
+**Lacuna 02 → 03 e como foi recuperada.** Entre os dois exports houve uma
+compactação de contexto; o `/export` seguinte (03) só trouxe o que veio depois
+dela. O trecho intermediário — minha escolha do modo de revisão ("b"), a
+implementação de T-002/T-003 e o ajuste do plan (`815377e`) — não estava em
+nenhum export. Percebi ao conferir as emendas: a 02 terminava na pergunta "por
+task (A) ou por fase (B)?" e a 03 começava na revisão da Fundação. Recuperei o
+trecho do `.jsonl` da sessão (alternativa prevista no FAQ) com um script que
+mantém as mensagens completas e trunca comandos/resultados de ferramenta com
+indicação do que foi omitido; o cabeçalho de `02b-fundacao.md` descreve o método.
+As emendas 02→02b→03 foram conferidas: nada repetido, nada faltando.
+
+**Privacidade.** Em todos os arquivos, o caminho pessoal (`/Users/<usuário>/` e a
+variante `-Users-<usuário>-` em caminhos temporários) foi trocado por `~/` /
+`-Users-USUARIO-`; conferido por busca que retornou zero ocorrências.
+
+**Daqui para frente:** uma sessão nova por fase, com `/export` ao fim de cada uma,
+para que cada arquivo contenha só a sua fase.
+
+---
+
 ## Delegação
 
 *O que você fez, o que o Claude fez, e por que dividiu assim.*
