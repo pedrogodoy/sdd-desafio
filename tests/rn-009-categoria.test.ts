@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { normalizarCategoria, verificarCategoria } from '../src/regras/categoria.js';
-import { doExemplo } from './fabrica.js';
+import { avaliarDespesas, doExemplo, entradaDoExemplo } from './fabrica.js';
 
 const avaliar = (categoria: string) => verificarCategoria(normalizarCategoria(categoria));
 
@@ -14,7 +14,12 @@ describe('RN-009 — categorias reembolsáveis', () => {
     expect(avaliar('ALIMENTACAO')).toBeNull();
   });
 
-  it.todo('AC: d-014 ALIMENTACAO, R$ 61,00 em 31/07 → recebe R$ 60,00 (parcial) — via motor, T-013');
+  it('AC: d-014 ALIMENTACAO, R$ 61,00 em 31/07 → tratada como alimentacao; recebe R$ 60,00 (parcial)', () => {
+    const a = avaliarDespesas(entradaDoExemplo().despesas).get('d-014')!;
+    expect(a.categoria).toBe('alimentacao');
+    expect(a.reembolsoExato.toString()).toBe('60');
+    expect(a.cortadaPorLimite).toBe(true);
+  });
 
   it('AC: Alimentação (acento e inicial maiúscula) → tratada como alimentacao', () => {
     expect(normalizarCategoria('Alimentação')).toBe('alimentacao');

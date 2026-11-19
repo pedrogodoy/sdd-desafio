@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { arredondarReembolso } from '../src/regras/arredondamento.js';
 import { aplicarLimiteDiario } from '../src/regras/limite-diario.js';
 import { datasEmViagem } from '../src/regras/viagem.js';
-import { despesa, doExemplo, itensLimite } from './fabrica.js';
+import { avaliarDespesas, despesa, doExemplo, itensLimite } from './fabrica.js';
 
 const hospedagem = (data: string, descricao: string) =>
   despesa({ categoria: 'hospedagem', data, descricao, valor: 300 });
@@ -25,7 +25,14 @@ describe('RN-007 — datas em viagem', () => {
 
   // Os aceites de R$ 85,00 em 16/07 (integral) e 17/07 (parcial) estão em
   // tests/rn-001-limite-diario.test.ts, bloco "RN-007 — limite ampliado".
-  it.todo('AC: d-013 recusada → 22/07–25/07 não são viagem; alimentação R$ 70,00 em 23/07 → R$ 60,00 — via motor, T-013');
+  it('AC: d-013 recusada → 22/07 a 25/07 não são viagem; alimentação R$ 70,00 em 23/07 → R$ 60,00 (parcial)', () => {
+    const jantar = despesa({ id: 'j', data: '2026-07-23', categoria: 'alimentacao', valor: 70 });
+    const r = avaliarDespesas([doExemplo('d-013'), jantar]);
+    expect(r.get('j')).toMatchObject({ emViagem: false, cortadaPorLimite: true });
+    expect(r.get('j')!.reembolsoExato.toString()).toBe('60');
+    expect(r.get('j')!.limiteAplicado!.toString()).toBe('60');
+    expect(r.get('d-013')!.emViagem).toBe(false);
+  });
 
   it('sem hospedagem elegível, não há datas em viagem', () => {
     expect(datasEmViagem([]).size).toBe(0);

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { normalizarCategoria } from '../src/regras/categoria.js';
 import { detectarDuplicatas } from '../src/regras/duplicata.js';
 import type { Despesa } from '../src/modelo.js';
-import { despesa, doExemplo, entradaDoExemplo } from './fabrica.js';
+import { avaliarDespesas, despesa, doExemplo, entradaDoExemplo } from './fabrica.js';
 
 const itens = (despesas: Despesa[]) =>
   despesas.map((d) => ({ despesa: d, categoria: normalizarCategoria(d.categoria) }));
@@ -23,7 +23,13 @@ describe('RN-004 — duplicatas', () => {
     expect(motivos.has('d-006')).toBe(false);
   });
 
-  it.todo('AC: d-006 segue para o limite e recebe R$ 54,90 — via motor, T-013');
+  it('AC: d-006 segue para o limite e recebe R$ 54,90; d-007 recusada não consome o limite', () => {
+    const r = avaliarDespesas([doExemplo('d-006'), doExemplo('d-007')]);
+    expect(r.get('d-006')!.reembolsoExato.toString()).toBe('54.9');
+    expect(r.get('d-006')!.cortadaPorLimite).toBe(false);
+    expect(r.get('d-007')!.motivosRecusa).toEqual(['duplicata de d-006']);
+    expect(r.get('d-007')!.reembolsoExato.toString()).toBe('0');
+  });
 
   it('AC: iguais exceto pela descrição ("Almoço" × "Almoço equipe") → não são duplicatas', () => {
     const motivos = detectarDuplicatas(

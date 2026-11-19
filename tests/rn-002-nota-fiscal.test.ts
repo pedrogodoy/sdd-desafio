@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { aplicarLimiteDiario } from '../src/regras/limite-diario.js';
 import { verificarNotaFiscal } from '../src/regras/nota-fiscal.js';
-import { despesa, doExemplo, itensLimite } from './fabrica.js';
+import { avaliarDespesas, despesa, doExemplo, itensLimite } from './fabrica.js';
 
 describe('RN-002 — nota fiscal obrigatória acima de R$ 100,00', () => {
   it('AC: d-003 transporte R$ 100,00 sem nota → não exige nota', () => {
@@ -12,7 +12,13 @@ describe('RN-002 — nota fiscal obrigatória acima de R$ 100,00', () => {
     expect(verificarNotaFiscal(doExemplo('d-004'))).toBe('nota fiscal ausente');
   });
 
-  it.todo('AC: dia 06/07 (d-003 + d-004) → só d-003 entra no limite, recebe R$ 80,00 (parcial) — via motor, T-013');
+  it('AC: dia 06/07 (d-003 + d-004) → só d-003 entra no limite de transporte, recebe R$ 80,00 (parcial)', () => {
+    const r = avaliarDespesas([doExemplo('d-003'), doExemplo('d-004')]);
+    expect(r.get('d-003')).toMatchObject({ cortadaPorLimite: true, motivoParcial: 'limite diário excedido' });
+    expect(r.get('d-003')!.reembolsoExato.toString()).toBe('80');
+    expect(r.get('d-004')!.motivosRecusa).toEqual(['nota fiscal ausente']);
+    expect(r.get('d-004')!.reembolsoExato.toString()).toBe('0');
+  });
 
   it('AC: transporte R$ 60,00 + R$ 55,00 no mesmo dia, sem nota → nenhuma exige nota; soma 115 → limite 80 por RN-001', () => {
     const dia = { data: '2026-07-20', categoria: 'transporte_urbano', temNotaFiscal: false };

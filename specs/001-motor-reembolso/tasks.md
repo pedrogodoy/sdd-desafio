@@ -81,11 +81,11 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-018** — Ordem natural de `id` (`src/texto.ts`) usada no desempate do limite diário e na escolha da duplicata mantida. *Criada em D-002.*
   - **Atende:** spec §5 (Ordem de `id`), AMB-015; altera o comportamento entregue em T-007 e T-012
   - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa o caso d-9 × d-10 (d-9 recebe 40,00, d-10 recebe 20,00); `tests/rn-004-duplicata.test.ts` passa o caso d-10 × d-9 (d-9 mantida); `tests/texto.test.ts` cobre a comparação (d-9 < d-10, d-01 × d-1, trechos de texto).
-  - **Commit:**
+  - **Commit:** `ad0ca21`
 
 ## Fase 3 — Orquestração e casos de borda
 
-- [ ] **T-013** — Motor (`src/motor.ts`): fase 1 com acúmulo de todos os motivos na ordem da spec §8, fase 2 só com elegíveis.
+- [x] **T-013** — Motor (`src/motor.ts`): fase 1 com acúmulo de todos os motivos na ordem da spec §8, fase 2 só com elegíveis.
   - **Atende:** spec §8, DT-004
   - **Aceite:** `tests/ordem-aplicacao.test.ts` passa (15/04 + R$ 150 sem nota → dois motivos na ordem; recusada não consome limite; hospedagem recusada não gera viagem e sai com `diarias` nulo (AMB-016); reordenar a entrada não altera valores) e os `it.todo` deixados na Fase 2 viram testes.
   - **Commit:**

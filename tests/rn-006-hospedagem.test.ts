@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { aplicarLimiteHospedagem, extrairDiarias } from '../src/regras/hospedagem.js';
-import { despesa, doExemplo } from './fabrica.js';
+import { avaliarDespesas, despesa, doExemplo } from './fabrica.js';
 
 const hospedagem = (descricao: string, valor: number) =>
   despesa({ categoria: 'hospedagem', descricao, valor, temNotaFiscal: true });
@@ -42,7 +42,13 @@ describe('RN-006 — limite de hospedagem por diária', () => {
     expect(extrairDiarias(doExemplo('d-013').descricao)).toBe(3);
   });
 
-  it.todo('AC: d-013 sem nota → recusada por RN-002 antes do limite (N = 3 não chega a ser aplicado) — via motor, T-013');
+  it('AC: d-013 sem nota → recusada por RN-002 antes do limite; diarias e limite nulos (AMB-016)', () => {
+    const a = avaliarDespesas([doExemplo('d-013')]).get('d-013')!;
+    expect(a.motivosRecusa).toEqual(['nota fiscal ausente']);
+    expect(a.reembolsoExato.toString()).toBe('0');
+    expect(a.diarias).toBeNull();
+    expect(a.limiteAplicado).toBeNull();
+  });
 
   describe('padrão de diárias (DT-005)', () => {
     it.each([

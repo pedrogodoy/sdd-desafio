@@ -2,7 +2,8 @@
 import { readFileSync } from 'node:fs';
 import { Decimal } from 'decimal.js';
 import { interpretarEntrada } from '../src/entrada.js';
-import type { Despesa, Entrada } from '../src/modelo.js';
+import { avaliar } from '../src/motor.js';
+import type { Avaliacao, Despesa, Entrada } from '../src/modelo.js';
 import type { CategoriaComLimiteDiario } from '../src/politica.js';
 import { normalizarCategoria } from '../src/regras/categoria.js';
 import type { ItemLimiteDiario } from '../src/regras/limite-diario.js';
@@ -46,4 +47,10 @@ export function doExemplo(id: string): Despesa {
 /** Itens para aplicarLimiteDiario a partir de despesas já elegíveis. */
 export function itensLimite(despesas: Despesa[]): ItemLimiteDiario[] {
   return despesas.map((d) => ({ despesa: d, categoria: normalizarCategoria(d.categoria) as CategoriaComLimiteDiario }));
+}
+
+/** Roda o motor com o colaborador e o período do exemplo; devolve as avaliações por id. */
+export function avaliarDespesas(despesas: Despesa[]): Map<string, Avaliacao> {
+  const { colaborador, periodo } = entradaDoExemplo();
+  return new Map(avaliar({ colaborador, periodo, despesas }).map((a) => [a.despesa.id, a]));
 }
