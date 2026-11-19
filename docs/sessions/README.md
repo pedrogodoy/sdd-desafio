@@ -9,3 +9,4 @@ lacunas e como foram tratadas: `docs/RELATORIO.md`, seção "Registro das sessõ
 | `02-plan-tasks-setup.md` | plan, tasks, T-001 | contém a 01 inteira no início (mesma conversa); conteúdo novo a partir de "parece que a spec ficou fora do docs" |
 | `02b-fundacao.md` | T-002, T-003 | reconstruído do `.jsonl`: ficou fora dos exports por uma compactação de contexto |
 | `03-regras-motor.md` | T-004 a T-014, T-018; D-001 a D-003 | começa logo após a compactação |
+| `04-saida-cli.md` | revisão da fase 3; T-015 a T-017 | sessão nova, sem sobreposição com a 03 |

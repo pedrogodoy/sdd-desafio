@@ -110,7 +110,7 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-017** — README do projeto: o que é, como instalar, rodar e testar, onde estão spec/plan/tasks.
   - **Atende:** entrega do desafio
   - **Aceite:** seguindo só o README num clone limpo, `npm install`, `npm test` e o comando de exemplo funcionam.
-  - **Commit:**
+  - **Commit:** `3b901b8`
 
 ---
 
