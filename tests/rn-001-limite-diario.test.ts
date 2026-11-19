@@ -41,6 +41,12 @@ describe('RN-001 — limite diário por categoria', () => {
     expect(r.t).toMatchObject({ reembolso: '70', limite: '80', parcial: false });
   });
 
+  it('AC: d-9 e d-10 com R$ 40,00 na mesma data → d-9 vem antes (ordem de id) e recebe 40,00; d-10 recebe 20,00 (parcial)', () => {
+    const r = limitar([alimentacao('d-10', 40), alimentacao('d-9', 40)]);
+    expect(r['d-9']).toEqual({ reembolso: '40', limite: '60', parcial: false, motivo: null });
+    expect(r['d-10']).toEqual({ reembolso: '20', limite: '60', parcial: true, motivo: 'limite diário excedido' });
+  });
+
   it('AMB-002: valores iguais desempatam por id crescente; as seguintes recebem R$ 0,00', () => {
     const r = limitar([alimentacao('d-102', 30), alimentacao('d-101', 30), alimentacao('d-100', 30)]);
     expect(r['d-100']).toMatchObject({ reembolso: '30', parcial: false });

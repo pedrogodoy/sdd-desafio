@@ -43,6 +43,11 @@ describe('RN-004 — duplicatas', () => {
     });
   });
 
+  it('AC: duas idênticas d-10 e d-9 → d-9 mantida (ordem de id); d-10 "duplicata de d-9"', () => {
+    const motivos = detectarDuplicatas(itens([despesa({ ...base, id: 'd-10' }), despesa({ ...base, id: 'd-9' })]));
+    expect(Object.fromEntries(motivos)).toEqual({ 'd-10': 'duplicata de d-9' });
+  });
+
   it('AC (spec §8): ALIMENTACAO e alimentacao com os demais campos iguais → duplicatas', () => {
     const motivos = detectarDuplicatas(
       itens([despesa({ ...base, id: 'd-041', categoria: 'ALIMENTACAO' }), despesa({ ...base, id: 'd-040' })]),

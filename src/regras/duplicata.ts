@@ -1,6 +1,7 @@
 // RN-004 — Duplicatas (AMB-008).
 import type { Despesa } from '../modelo.js';
 import { MOTIVOS } from '../politica.js';
+import { compararIds } from '../texto.js';
 
 export interface ItemDuplicata {
   despesa: Despesa;
@@ -14,7 +15,7 @@ function chave({ despesa: d, categoria }: ItemDuplicata): string {
 
 /**
  * Considera todas as despesas da entrada. Devolve, para cada despesa recusada
- * como duplicata, o motivo "duplicata de <id mantido>"; a de menor `id` do grupo
+ * como duplicata, o motivo "duplicata de <id mantido>"; a de menor `id` (ordem natural, AMB-015) do grupo
  * não aparece no mapa.
  */
 export function detectarDuplicatas(itens: ItemDuplicata[]): Map<string, string> {
@@ -26,7 +27,7 @@ export function detectarDuplicatas(itens: ItemDuplicata[]): Map<string, string> 
 
   const motivos = new Map<string, string>();
   for (const ids of grupos.values()) {
-    const [mantido, ...demais] = [...ids].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+    const [mantido, ...demais] = [...ids].sort(compararIds);
     for (const id of demais) motivos.set(id, MOTIVOS.duplicataDe(mantido!));
   }
   return motivos;

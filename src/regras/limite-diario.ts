@@ -3,6 +3,7 @@
 import { Decimal } from 'decimal.js';
 import type { Despesa } from '../modelo.js';
 import { FATOR_VIAGEM, LIMITE_DIARIO, MOTIVOS, type CategoriaComLimiteDiario } from '../politica.js';
+import { compararIds } from '../texto.js';
 
 export interface ItemLimiteDiario {
   despesa: Despesa; // elegível (fase 1)
@@ -17,11 +18,9 @@ export interface ResultadoLimiteDiario {
   emViagem: boolean;
 }
 
-/** Menor valor primeiro; empate por id crescente (comparação de texto). */
+/** Menor valor primeiro; empate por id crescente (ordem natural, AMB-015). */
 function ordemDeConsumo(a: Despesa, b: Despesa): number {
-  const porValor = a.valor.comparedTo(b.valor);
-  if (porValor !== 0) return porValor;
-  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  return a.valor.comparedTo(b.valor) || compararIds(a.id, b.id);
 }
 
 /**

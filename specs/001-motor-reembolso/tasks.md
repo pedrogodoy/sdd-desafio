@@ -76,9 +76,9 @@ Cada task cria um arquivo em `src/regras/` e o seu teste. Os `it(...)` reproduze
 - [x] **T-012** — Limite diário por categoria com distribuição do menor para o maior e limite ampliado em viagem (`regras/limite-diario.ts`).
   - **Atende:** RN-001, RN-007, AMB-001, AMB-002, AMB-003
   - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa (03/07 → d-002 38, d-001 22; 61 → 60; 60 → 60 integral; categorias independentes; empate por `id`) e os casos de limite ampliado da RN-007 (85 em 16/07 integral; 85 em 17/07 → 60).
-  - **Commit:**
+  - **Commit:** `3cf186e`
 
-- [ ] **T-018** — Ordem natural de `id` (`src/texto.ts`) usada no desempate do limite diário e na escolha da duplicata mantida. *Criada em D-002.*
+- [x] **T-018** — Ordem natural de `id` (`src/texto.ts`) usada no desempate do limite diário e na escolha da duplicata mantida. *Criada em D-002.*
   - **Atende:** spec §5 (Ordem de `id`), AMB-015; altera o comportamento entregue em T-007 e T-012
   - **Aceite:** `tests/rn-001-limite-diario.test.ts` passa o caso d-9 × d-10 (d-9 recebe 40,00, d-10 recebe 20,00); `tests/rn-004-duplicata.test.ts` passa o caso d-10 × d-9 (d-9 mantida); `tests/texto.test.ts` cobre a comparação (d-9 < d-10, d-01 × d-1, trechos de texto).
   - **Commit:**
